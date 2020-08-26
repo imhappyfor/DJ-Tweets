@@ -1,0 +1,3 @@
+get user tweets from last 30 days
+get emotional analysis for each individually
+then an overall to be used for the key
