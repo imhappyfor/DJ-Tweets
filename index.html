@@ -1,68 +1,79 @@
 <html>
-    
-    <head>
-        <title>❤ Cadenza ❤</title>
-        <script src="https://cdn.jsdelivr.net/npm/p5@1.1.9/lib/p5.js"></script>
-        <script src="sketch.js"></script>
-        <canvas id="canvas"></canvas>
 
-        <!-- You need to bring your own Tone.js for the player, and tfjs for the model -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/13.8.21/Tone.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/tensorflow/1.2.8/tf.min.js"></script>
-        <!-- Core library, since we're going to use a player -->
-        <script src="https://cdn.jsdelivr.net/npm/@magenta/music@^1.0.0/es6/core.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/@magenta/music@^1.0.0"></script>
-        <!--Model we want to use -->
-        <script src="https://cdn.jsdelivr.net/npm/@magenta/music@^1.0.0/es6/music_vae.js"></script>
-        <script src="https://cdn.pubnub.com/sdk/javascript/pubnub.4.3.2.min.js"></script>
-    
-    </head>
+<head>
+    <title>❤ Cadenza ❤</title>
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.1.9/lib/p5.js"></script>
+    <script src="sketch.js"></script>
+    <canvas id="canvas"></canvas>
 
-    <body class="parent">
+    <!-- You need to bring your own Tone.js for the player, and tfjs for the model -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/13.8.21/Tone.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tensorflow/1.2.8/tf.min.js"></script>
+    <!-- Core library, since we're going to use a player -->
+    <script src="https://cdn.jsdelivr.net/npm/@magenta/music@^1.0.0/es6/core.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@magenta/music@^1.0.0"></script>
+    <!--Model we want to use -->
+    <script src="https://cdn.jsdelivr.net/npm/@magenta/music@^1.0.0/es6/music_vae.js"></script>
+    <script src="https://cdn.pubnub.com/sdk/javascript/pubnub.4.3.2.min.js"></script>
 
-        <main>   
-        </main>
-        <div id="controls">
-            <button id="play" onclick="userClicked()">play</button>
-            <button id="pause">Pause</button>
-            <button id="stop">Stop</button>
-        </div>
-    </body>
+</head>
+
+<body class="parent">
+
+    <main>
+    </main>
+    <div id="controls">
+        <button id="play" onclick="userClicked()">play</button>
+        <button id="pause">Pause</button>
+        <button id="stop">Stop</button>
+    </div>
+</body>
 
 
 
-    <script>
+<script>
 
-        var pubnub = new PubNub({
-            subscribeKey: 'sub-c-78806dd4-42a6-11e4-aed8-02ee2ddab7fe'
-            });
-            console.log(pubnub)
-        pubnub.addListener({
+    var pubnub = new PubNub({
+        subscribeKey: 'sub-c-78806dd4-42a6-11e4-aed8-02ee2ddab7fe'
+    });
+    console.log(pubnub)
+    pubnub.addListener({
         message: function(message) {
         // console.log(message.message); 
         }
             });
 
-        pubnub.subscribe({
+    pubnub.subscribe({
         channels: ['pubnub-twitter']
-        });
+    });
+    // emotion analysis 1000 requests / day
+    let text = "I hate to turn up out of the blue, uninvited But I couldn't stay away, I couldn't fight it I had hoped you'd see my face And that you'd be reminded that for me, it isn't over";
+    const apiKey = "fnH1snv21JF75jHDbXCDMBKxfPFRKOFab5r3xSWztrU";
 
-        
+    fetch("https://apis.paralleldots.com/v5/emotion", {
+        body: "api_key=" +  apiKey + "&text=" + text,
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        method: "POST"
+    })
+    .then(response => response.json())
+    .then(data => console.log(data));
 
 
 
 
     // Each bundle exports a global object with the name of the bundle.
-        
-        //...
-        var config = {
-            noteHeight: 6,
-            pixelsPerTimeStep: 30,  // like a note width
-            noteSpacing: 1,
-            noteRGB: '8, 41, 64',
-            activeNoteRGB: '240, 84, 119',
-            }
-          var  TWINKLE_TWINKLE = {
+
+    //...
+    var config = {
+        noteHeight: 6,
+        pixelsPerTimeStep: 30,  // like a note width
+        noteSpacing: 1,
+        noteRGB: '8, 41, 64',
+        activeNoteRGB: '240, 84, 119',
+    }
+    var  TWINKLE_TWINKLE = {
             notes: [
                 {pitch: 60, startTime: 0.0, endTime: 0.5},
                 {pitch: 60, startTime: 0.5, endTime: 1.0},
@@ -79,108 +90,108 @@
                 {pitch: 62, startTime: 6.5, endTime: 7.0},
                 {pitch: 60, startTime: 7.0, endTime: 8.0},  
             ],
-            totalTime: 8
-        };
-        
-
-            
-        let viz = null
-        let vizCreated = false
-        const mvae = new music_vae.MusicVAE('https://storage.googleapis.com/magentadata/js/checkpoints/music_vae/mel_2bar_small');
-
-            
+        totalTime: 8
+    };
 
 
-        function userClicked(){
-            // vizPlayer = new mm.Player(false, {
-            // run: (note) => {
-            //     console.log(note)
-            //     viz.redraw(note)
-            // },
-            // stop: () => {console.log('done');}
-            // });
 
-            // vizPlayer.start(TWINKLE_TWINKLE)
+    let viz = null
+    let vizCreated = false
+    const mvae = new music_vae.MusicVAE('https://storage.googleapis.com/magentadata/js/checkpoints/music_vae/mel_2bar_small');
 
-            // player.start(TWINKLE_TWINKLE);
-        mvae.initialize().then(() => {  
-        mvae.sample(2).then((samples) => 
-        {  
 
-        
 
-            // if (!vizCreated){
-            //     viz = new mm.Visualizer(samples[0], document.getElementById('canvas'), config);    
-            // }
-            // else {
 
-            // }
-            console.log(samples[0])
-            viz = new mm.Visualizer(samples[0].toJSON(), document.getElementById('canvas'), config);    
-            // viz = new mm.Visualizer(TWINKLE_TWINKLE, document.getElementById('canvas'), config); 
-            var tt = 0
-            player = new core.Player(false, {
-                run: (note) => {
-                    // console.log('hey')    
-                    let newNote = {
-                        endTime: note.endTime,
-                        pitch: note.pitch,
-                        startTime: note.startTime
-                    }
-                    console.log(newNote)
-                    viz.redraw(newNote)
-                },
-                
-                stop: () => {console.log('done')}
-            });
-            console.log(samples[0])
-            player.start(samples[0]) 
-            // player.start(TWINKLE_TWINKLE) 
-            // draw(samples[0])
-        }
-        );
+    function userClicked(){
+        // vizPlayer = new mm.Player(false, {
+        // run: (note) => {
+        //     console.log(note)
+        //     viz.redraw(note)
+        // },
+        // stop: () => {console.log('done');}
+        // });
+
+        // vizPlayer.start(TWINKLE_TWINKLE)
+
+        // player.start(TWINKLE_TWINKLE);
+        mvae.initialize().then(() => {
+            mvae.sample(2).then((samples) => 
+            {
+
+
+
+                // if (!vizCreated){
+                //     viz = new mm.Visualizer(samples[0], document.getElementById('canvas'), config);    
+                // }
+                // else {
+
+                // }
+                console.log(samples[0])
+                viz = new mm.Visualizer(samples[0].toJSON(), document.getElementById('canvas'), config);
+                // viz = new mm.Visualizer(TWINKLE_TWINKLE, document.getElementById('canvas'), config); 
+                var tt = 0
+                player = new core.Player(false, {
+                    run: (note) => {
+                        // console.log('hey')    
+                        let newNote = {
+                            endTime: note.endTime,
+                            pitch: note.pitch,
+                            startTime: note.startTime
+                        }
+                        console.log(newNote)
+                        viz.redraw(newNote)
+                    },
+
+                    stop: () => {console.log('done')}
+                });
+                console.log(samples[0])
+                player.start(samples[0])
+                // player.start(TWINKLE_TWINKLE) 
+                // draw(samples[0])
+            }
+            );
         });
     }
-    </script>
+</script>
 
 
 
 
-    <style>
-        .parent {
-            height: 500px;
-            display: grid;
-            place-items: center;
-            margin: 0 0;
-            
-            }
-        #controls {
-            display: grid;
-            grid-template-rows: 1fr;
-            grid-template-columns: repeat(13,1fr);
-            width: 100%;
-        }
-        button{
-            color:white;
-            width: 20ch;
-            height: 20px;
-        }
-        #play {
-            grid-column: 2;
-            border-radius:  50px 50%;
-            background-color: green;
-            
-        }
-        #pause {
-            grid-column: 7;
-            border-radius:  20%;
-            background-color: gray;
-        }
-        #stop {
-            grid-column: 12;
-            border-radius:  50% 50px;
-            background-color: red;
-        }
-    </style>
+<style>
+    .parent {
+        height: 500px;
+        display: grid;
+        place-items: center;
+        margin: 0 0;
+
+    }
+    #controls {
+        display: grid;
+        grid-template-rows: 1fr;
+        grid-template-columns: repeat(13,1fr);
+        width: 100%;
+    }
+    button{
+        color:white;
+        width: 20ch;
+        height: 20px;
+    }
+    #play {
+        grid-column: 2;
+        border-radius:  50px 50%;
+        background-color: green;
+
+    }
+    #pause {
+        grid-column: 7;
+        border-radius:  20%;
+        background-color: gray;
+    }
+    #stop {
+        grid-column: 12;
+        border-radius:  50% 50px;
+        background-color: red;
+    }
+</style>
 
 </html>
