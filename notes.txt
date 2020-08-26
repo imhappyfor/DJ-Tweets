@@ -1,3 +1,48 @@
 get user tweets from last 30 days
 get emotional analysis for each individually
 then an overall to be used for the key
+
+brainstorming how to use emotion results to generate music:
+angry- more randomness
+excited- faster tempo
+fear- diminished/augmented
+happy- major
+indifferent- smaller note range
+sad- minor
+
+references on characterization of keys:
+Christian Friedrich Daniel Schubart's musical treatise:
+* SUGGESTIONS *
+angry- BM
+excited- maybe CM? Excitement is sort of naive
+fear- gm,
+happy- BbM
+indifferent- we should just pick a random one, we'll be indifferent about it :)
+sad- ebm, cm, c#m, g#m, fm... so many sad keys
+
+* ALL KEYS *
+CM- pure, innocent, simple, naive
+cm- sad love
+c#m- sadness, dissatisfaction
+DbM- "unusual characters and feelings"
+DM- hallelujah
+dm- brooding
+EbM- love, devotation
+ebm- anxiety, deep depression
+EM- joy
+em- naive, sighs, hope
+FM- complacence and repose
+fm- depression
+f#m- gloom, anger
+GbM- triumph, relief
+GM- quiet, rustic, tender
+gm- worry, anger, disgust
+g#m- misery
+AbM- death
+AM- innocence, hope
+am- pious womanhood, tenderness
+BbM- Cheerful, hopeful
+bbm- disgruntled, displeasure
+BM- anger, rage
+bm- patience
+
