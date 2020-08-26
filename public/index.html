@@ -33,6 +33,7 @@
 
 
 <script>
+    let arrayofEmotions = [];
     var pubnub = new PubNub({
         subscribeKey: 'sub-c-78806dd4-42a6-11e4-aed8-02ee2ddab7fe'
     });
@@ -58,7 +59,10 @@
             method: "POST"
         })
         .then(response => response.json())
-        .then(data => console.log(data));
+        .then(data => {
+            arrayofEmotions.push(data);
+            console.log(arrayofEmotions);
+        });
     }
     // analyzeText("I hate to turn up out of the blue, uninvited But I couldn't stay away, I couldn't fight it I had hoped you'd see my face And that you'd be reminded that for me, it isn't over");
 
@@ -153,10 +157,9 @@
         });
     }
 
-    function getTweetsByUser() {
-        const token = "paste it here buddy";
-        let twitterUser = "andrewyang"
-        fetch("https://cors-anywhere.herokuapp.com/https://api.twitter.com/2/tweets/search/recent?query=from:" + twitterUser, {
+    function getTweetsByUser(twitterUser) {
+        const token = "put the token here";
+        fetch("https://cors-anywhere.herokuapp.com/https://api.twitter.com/2/tweets/search/recent?query=from:" + twitterUser + " -is:retweet", {
             headers: {
                 'Authorization': `Bearer ${token}`,
                 "Content-Type": "application/json"
@@ -164,9 +167,16 @@
             method: "GET"
         })
         .then(response => response.json())
-        .then(data => console.log(data));
+        .then(results => {
+            let concatenatedText = "";
+            for (let i = 0; i < results.data.length; i++) {
+                concatenatedText += results.data[i].text;
+                analyzeText(results.data[i].text);
+            }
+            analyzeText(concatenatedText);
+        });
     }
-    // getTweetsByUser()
+    getTweetsByUser("andrewyang")
 </script>
 
 
