@@ -46,21 +46,21 @@
     pubnub.subscribe({
         channels: ['pubnub-twitter']
     });
+
     // emotion analysis 1000 requests / day
-    let text = "I hate to turn up out of the blue, uninvited But I couldn't stay away, I couldn't fight it I had hoped you'd see my face And that you'd be reminded that for me, it isn't over";
-    const apiKey = "fnH1snv21JF75jHDbXCDMBKxfPFRKOFab5r3xSWztrU";
-
-    fetch("https://apis.paralleldots.com/v5/emotion", {
-        body: "api_key=" +  apiKey + "&text=" + text,
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded"
-        },
-        method: "POST"
-    })
-    .then(response => response.json())
-    .then(data => console.log(data));
-
-
+    function analyzeText(text) {
+        const apiKey = "fnH1snv21JF75jHDbXCDMBKxfPFRKOFab5r3xSWztrU";
+        fetch("https://apis.paralleldots.com/v5/emotion", {
+            body: "api_key=" +  apiKey + "&text=" + text,
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            method: "POST"
+        })
+        .then(response => response.json())
+        .then(data => console.log(data));
+    }
+    // analyzeText("I hate to turn up out of the blue, uninvited But I couldn't stay away, I couldn't fight it I had hoped you'd see my face And that you'd be reminded that for me, it isn't over");
 
 
     // Each bundle exports a global object with the name of the bundle.
@@ -152,6 +152,21 @@
             );
         });
     }
+
+    function getTweetsByUser() {
+        const token = "paste it here buddy";
+        let twitterUser = "andrewyang"
+        fetch("https://cors-anywhere.herokuapp.com/https://api.twitter.com/2/tweets/search/recent?query=from:" + twitterUser, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                "Content-Type": "application/json"
+            },
+            method: "GET"
+        })
+        .then(response => response.json())
+        .then(data => console.log(data));
+    }
+    // getTweetsByUser()
 </script>
 
 
