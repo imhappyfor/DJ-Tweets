@@ -1,19 +1,15 @@
-var static = require('node-static');
-var http = require('http');
+const express = require('express');
+const app = express();
+var cors = require('cors');
+var path = require('path');
+app.use(cors());
+const port = 3000
+app.use('/static', express.static('public/'))
 
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname + '/public/index.html'));
+})
 
-var file = new static.Server({
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET',
-      'Access-Control-Allow-Headers': 'Content-Type'
-    },
-    indexFile: "./public/index.html"
-  });
-
-
-    http.createServer(function (req, res) {
-        file.serve(req, res);
-    }).listen(8080);
-
-console.log('Listening on localhost:8080');
+app.listen(port, () => {
+    console.log(`Example app listening at http://localhost:${port}`)
+})

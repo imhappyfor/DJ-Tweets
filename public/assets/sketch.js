@@ -12,8 +12,9 @@ y = -rectangleHeight/2
 // let matrix = 3
 function draw(x){
     if (x){
-        console.log(x)
+        
     }
+    
     background(125,20,36);
     circle()
     // for (let x = 0; x < matrix*matrix; x++){
@@ -21,10 +22,14 @@ function draw(x){
     //     rect((20 + x*20),(20 - x*20),20,20);
     // }
     
-    fill('black');
+    
     // container();
-    // fill('white');
-    // rect(0,0,20,20);
+    fill('red');
+    rect(-(width/2),-(height/2),width/2,height);
+
+
+    fill('blue');
+    rect(0,-(height/2),width/2,height);
     
 }
 function mousePressed(){

@@ -3,8 +3,9 @@
 <head>
     <title>❤ Cadenza ❤</title>
     <script src="https://cdn.jsdelivr.net/npm/p5@1.1.9/lib/p5.js"></script>
-    <script src="./assets/sketch.js"></script>
-    <canvas id="canvas"></canvas>
+    <script src="static/assets/sketch.js"></script>
+    
+    
 
     <!-- You need to bring your own Tone.js for the player, and tfjs for the model -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/13.8.21/Tone.js"></script>
@@ -19,7 +20,7 @@
 </head>
 
 <body class="parent">
-
+    <!-- <canvas id="canvas"></canvas> -->
     <main>
     </main>
     <div id="controls">
@@ -32,7 +33,6 @@
 
 
 <script>
-
     var pubnub = new PubNub({
         subscribeKey: 'sub-c-78806dd4-42a6-11e4-aed8-02ee2ddab7fe'
     });
@@ -147,7 +147,7 @@
                 console.log(samples[0])
                 player.start(samples[0])
                 // player.start(TWINKLE_TWINKLE) 
-                // draw(samples[0])
+                draw(samples[0])
             }
             );
         });
