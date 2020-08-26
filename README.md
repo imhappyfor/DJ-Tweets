@@ -6,4 +6,4 @@
 
 ## Using This App
 
-* To use this application all you have to do is clone and serve it on your favorite server. Better yet just open the index.html on your favorite web browser to just view it. 😊
+* To use this application all you have to do is clone and npm i node-static. Then just run node ./index.js 😊
