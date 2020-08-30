@@ -90,7 +90,8 @@
             getEmotionMelodies();
             Tone.Transport.stop();
             console.log(synth)
-            if (synth._wasDisposed) {
+            if (synth._wasDisposed || synth._synced === true) {
+                synth.dispose();
                 synth = new Tone.Synth().toDestination()
                 synth.onsilence = function () {
                     console.log('test')
