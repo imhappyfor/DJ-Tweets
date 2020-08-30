@@ -15,6 +15,7 @@
     <button onclick="play()">Play</button>
     <script>
         const synth = new Tone.Synth().toMaster()
+
         let cmajor = [60, 62, 64, 65, 67, 69, 71, 72, 74, 76, 77, 79, 81, 83, 84];
         let cminor = [60, 62, 63, 65, 67, 68, 70, 72, 74, 75, 77, 79, 80, 82, 84];
 
@@ -22,7 +23,7 @@
         let endTime;
         let totalTime;
         let seedSequence = {
-            totalQuantizedSteps: 25,
+            totalQuantizedSteps: null,
             quantizationInfo: {
                 // the higher the number the "faster" it is, basically how many the base length is divided into
                 stepsPerQuarter: 4
@@ -39,9 +40,6 @@
         let emotionsArray = ["excited", "indifferent"];
         // Initialize the model.
         music_rnn = new mm.MusicRNN('https://storage.googleapis.com/magentadata/js/checkpoints/music_rnn/chord_pitches_improv');
-        music_rnn.initialize();
-
-        rnnPlayer = new mm.Player();
 
         function getNotes(transposition) {
             for (let i = 0; i < 10; i++) {
@@ -50,7 +48,6 @@
                 seedSequence.notes.push(note);
                 startTime += newNoteLength;
             }
-            console.log(seedSequence)
         }
 
         function returnNote() {
@@ -79,37 +76,30 @@
             }
         }
 
-        getEmotionMelodies()
-
         async function play() {
-            console.log("play function")
-            // if (rnnPlayer.isPlaying()) {
-            //     rnnPlayer.stop();
-            //     return;
-            // }
-
+            await music_rnn.initialize();
             // the generated melody is USUALLY in the key of the chord passed, sometimes in a closely related key like the 5th or relative major/minor
             // seems to accept most chord notation, ex. cm CM Cm F#m 
             // args: input sequence, how many steps into the future, temperature/how random, chord structure
-            let sample = await music_rnn.continueSequence(seedSequence, 100, 1.5, ['Gm'])
-            console.log("im", sample)
             let qns = mm.sequences.quantizeNoteSequence(seedSequence, 4);
+            seedSequence.totalQuantizedSteps = qns.notes[qns.notes.length - 1].quantizedEndStep;
+
+            let sample = await music_rnn.continueSequence(seedSequence, 100, 1.5, ['Cm'])
+
             sample.notes.forEach(note => {
                 note.quantizedStartStep += qns.notes[qns.notes.length - 1].quantizedEndStep
                 note.quantizedEndStep += qns.notes[qns.notes.length - 1].quantizedEndStep
             })
 
-            let allNotes = qns.notes.concat(sample.notes);
+            let unquantizedSample = mm.sequences.unquantizeSequence(sample, 120);
+            let allNotes = seedSequence.notes.concat(unquantizedSample.notes)
             sample.notes = allNotes;
-            console.log("all", sample)
-            // rnnPlayer.start(sample);
-            
             sample.notes.forEach(note => {
-                console.log(note)
-                synth.triggerAttackRelease(Tonal.Note.fromMidi(note.pitch), note.quantizedEndStep - note.quantizedStartStep, note.quantizedStartStep)
+                synth.triggerAttackRelease(Tonal.Note.fromMidi(note.pitch), note.endTime - note.startTime, note.startTime)
             })
-
         }
+
+        getEmotionMelodies();
 
     </script>
 </body>
