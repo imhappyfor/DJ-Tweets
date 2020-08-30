@@ -1,0 +1,30 @@
+body {
+    background: rgb(24, 37, 49);
+}
+#controls {
+display: flex;
+justify-content: center;
+align-items: center;
+}
+#searchPhraseInput {
+    color:  rgb(15, 118, 214);
+    font-size: 18px;
+    font-weight: 900;
+}
+button {
+    background: rgb(15, 118, 214);
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    /* display: inline-block; */
+    margin: 10px 10px;
+    font-size: 18px;
+    border-radius: 50px;
+}
+/* makes the button depress when clicked */
+button:active {
+    background: rgb(11, 79, 143);
+    transform: translateY(3px);
+}

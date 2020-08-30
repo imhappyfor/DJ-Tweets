@@ -7,29 +7,28 @@ rectangleWidth = 800;
 rectangleHeight = 400;
 x = -rectangleWidth/2
 y = -rectangleHeight/2
-// container = function(){return rect(x,y,rectangleWidth,rectangleHeight) }
+i = 0.0001;
+noteWidth = 50;
 }
-// let matrix = 3
-function draw(x){
+let notes = 20
+function draw(){
     if (x){
         
     }
-    
     background(125,20,36);
-    circle()
-    // for (let x = 0; x < matrix*matrix; x++){
-    //     fill(x*20,50,x*12);
-    //     rect((20 + x*20),(20 - x*20),20,20);
-    // }
-    
-    
-    // container();
-    fill('red');
-    rect(-(width/2),-(height/2),width/2,height);
+    // circle()
+    for (let x = 0; x < notes*notes; x++){
+        fill(x*20*i,50,10*i);
+        rect((-maxX + x*noteWidth),0,noteWidth,10);
+        i += 0.0001;
+    }
+    // split view
+    // fill('red');
+    // rect(-(width/2),-(height/2),width/2,height);
 
 
-    fill('blue');
-    rect(0,-(height/2),width/2,height);
+    // fill('blue');
+    // rect(0,-(height/2),width/2,height);
     
 }
 function mousePressed(){
@@ -38,6 +37,7 @@ function mousePressed(){
 
 function windowResized(){
     resizeCanvas(windowWidth, 500);
+    
 }
 
 function move(){
