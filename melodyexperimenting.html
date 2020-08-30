@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/13.8.25/Tone.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.39/Tone.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tonaljs/tonal/browser/tonal.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@magenta/music@^1.0.0/es6/core.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@magenta/music@1.0.0"></script>
@@ -13,9 +13,16 @@
 
 <body>
     <button onclick="play()">Play</button>
+    <button onclick="stop()">Stop Playback</button>
+    <button onclick="restart()">Generate new melody</button>
     <script>
-        const synth = new Tone.Synth().toMaster()
+        
+        let synth = new Tone.Synth().toDestination()
 
+        synth.onsilence = function(){
+            console.log('test')
+            stop()
+        }
         let cmajor = [60, 62, 64, 65, 67, 69, 71, 72, 74, 76, 77, 79, 81, 83, 84];
         let cminor = [60, 62, 63, 65, 67, 68, 70, 72, 74, 75, 77, 79, 80, 82, 84];
 
@@ -42,7 +49,9 @@
         music_rnn = new mm.MusicRNN('https://storage.googleapis.com/magentadata/js/checkpoints/music_rnn/chord_pitches_improv');
 
         function getNotes(transposition) {
-            for (let i = 0; i < 10; i++) {
+            seedSequence.notes = []
+            startTime = 0
+            for (let i = 0; i < 2; i++) {
                 let newNoteLength = returnNoteLength();
                 let note = { pitch: returnNote() + transposition, startTime: startTime, endTime: startTime + newNoteLength }
                 seedSequence.notes.push(note);
@@ -77,29 +86,52 @@
         }
 
         async function play() {
+            
+            
+            if (synth._wasDisposed) {
+                console.log('yo')
+                synth = new Tone.Synth().toDestination()
+                synth.onsilence = function(){
+                stop()
+                }
+                // getEmotionMelodies();
+            }
             await music_rnn.initialize();
             // the generated melody is USUALLY in the key of the chord passed, sometimes in a closely related key like the 5th or relative major/minor
             // seems to accept most chord notation, ex. cm CM Cm F#m 
             // args: input sequence, how many steps into the future, temperature/how random, chord structure
             let qns = mm.sequences.quantizeNoteSequence(seedSequence, 4);
             seedSequence.totalQuantizedSteps = qns.notes[qns.notes.length - 1].quantizedEndStep;
-
-            let sample = await music_rnn.continueSequence(seedSequence, 100, 1.5, ['Cm'])
-
+            let sample = await music_rnn.continueSequence(seedSequence, 10, 1.5, ['Cm'])
             sample.notes.forEach(note => {
+                
                 note.quantizedStartStep += qns.notes[qns.notes.length - 1].quantizedEndStep
                 note.quantizedEndStep += qns.notes[qns.notes.length - 1].quantizedEndStep
             })
-
             let unquantizedSample = mm.sequences.unquantizeSequence(sample, 120);
             let allNotes = seedSequence.notes.concat(unquantizedSample.notes)
             sample.notes = allNotes;
-            sample.notes.forEach(note => {
+            // synth.sync();
+            
+            await sample.notes.forEach(async (note) => {
+                console.log(note.startTime)
                 synth.triggerAttackRelease(Tonal.Note.fromMidi(note.pitch), note.endTime - note.startTime, note.startTime)
             })
+            // Tone.Transport.start();
+            // Tone.start();
+        }
+        getEmotionMelodies();
+
+        function stop() {
+            synth.dispose() 
+            synth = new Tone.Synth().toDestination()
+        }
+        function restart(){
+            stop();
+            play();
         }
 
-        getEmotionMelodies();
+
 
     </script>
 </body>
