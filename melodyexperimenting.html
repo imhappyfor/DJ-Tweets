@@ -87,15 +87,15 @@
 
         async function play() {
             
-            
-            if (synth._wasDisposed) {
-                console.log('yo')
-                synth = new Tone.Synth().toDestination()
-                synth.onsilence = function(){
-                stop()
-                }
-                // getEmotionMelodies();
-            }
+            Tone.Transport.stop();
+            // if (synth._wasDisposed) {
+            //     console.log('yo')
+            //     synth = new Tone.Synth().toDestination()
+            //     synth.onsilence = function(){
+            //     // stop()
+            //     }
+            //     // getEmotionMelodies();
+            // }
             await music_rnn.initialize();
             // the generated melody is USUALLY in the key of the chord passed, sometimes in a closely related key like the 5th or relative major/minor
             // seems to accept most chord notation, ex. cm CM Cm F#m 
@@ -111,20 +111,20 @@
             let unquantizedSample = mm.sequences.unquantizeSequence(sample, 120);
             let allNotes = seedSequence.notes.concat(unquantizedSample.notes)
             sample.notes = allNotes;
-            // synth.sync();
+            synth.sync();
             
             await sample.notes.forEach(async (note) => {
                 console.log(note.startTime)
                 synth.triggerAttackRelease(Tonal.Note.fromMidi(note.pitch), note.endTime - note.startTime, note.startTime)
             })
-            // Tone.Transport.start();
-            // Tone.start();
+            Tone.Transport.start();
+            Tone.start();
         }
         getEmotionMelodies();
 
         function stop() {
-            synth.dispose() 
-            synth = new Tone.Synth().toDestination()
+            // synth.dispose() 
+            // synth = new Tone.Synth().toDestination()
         }
         function restart(){
             stop();
