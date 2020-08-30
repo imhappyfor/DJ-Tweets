@@ -23,13 +23,10 @@ function getTweetsByUser(twitterUser) {
         return response.json()
     })
     .then(results => {
-        // let concatenatedText = "";
         for (let i = 0; i < results.data.length; i++) {
             twitterUserResultLength++
-            // concatenatedText += results.data[i].text;
             twittetUserTweets.push(results.data[i].text);
         }
-        twittetUserTweets.push(concatenatedText);
         // call analyzeText to get sentiment Analysis.
         analyzeText(twittetUserTweets)
     }).catch((err) => console.log(err))
