@@ -3,7 +3,7 @@
 // pass to music genetor file
 let retrivalComplete = false;
 let arrayOfEmotions = [];
-const maxResults = 20;
+const maxResults = 10;
 let twittetUserTweets= [];
 let twitterUserResultLength = 0;
 
@@ -40,7 +40,7 @@ function getTweetsByUser(twitterUser) {
    // TODO: The api produces a batch of tweets which is lengthy, as such a loading screen must be implemented
 function analyzeText(text) {
     arrayOfEmotions = []
-    const apiKey = "fnH1snv21JF75jHDbXCDMBKxfPFRKOFab5r3xSWztrU";
+    const apiKey = "76WGwi6v7KV8wqTAnDd8desN3aAoaDPqBLFz5Mbzhp8";
     fetch("https://apis.paralleldots.com/v5/emotion_batch", {
         body: `api_key=${apiKey}&text=["${text.join('","')}"]`,
         headers: {
@@ -98,4 +98,8 @@ function search(){
 // credit goes to @zzzzBov https://stackoverflow.com/questions/14313183/javascript-regex-how-do-i-check-if-the-string-is-ascii-only
 function isASCII(str) {
     return /^[\x00-\x7F]*$/.test(str);
+}
+
+function exportEmotions() {
+    return arrayOfEmotions;
 }
