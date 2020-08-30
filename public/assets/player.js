@@ -30,6 +30,7 @@ let synth = new Tone.Synth().toDestination()
         let maxNoteLength;
         let keyTransposition;
 
+        // TODO: generate notes from emotion.
         function setEmotions(data){
             emotionsArray = data
         }
