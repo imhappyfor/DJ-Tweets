@@ -6,7 +6,7 @@ let arrayOfEmotions = [];
 const maxResults = 10;
 let twittetUserTweets= [];
 let twitterUserResultLength = 0;
-
+let regexPattern = /[^a-z-A-Z ]/gm;
 
 function getTweetsByUser(twitterUser) {
     const token = "AAAAAAAAAAAAAAAAAAAAANLsHAEAAAAAWEaIgVm24L29R1SZEOFHW3JSyOU%3DdMPt50AorHw4ZKtHSCrRB0s1Me21Ly9K1PrIEvSXQ1gM0J9Eb9";
@@ -23,10 +23,10 @@ function getTweetsByUser(twitterUser) {
         return response.json()
     })
     .then(results => {
-        let concatenatedText = "";
+        // let concatenatedText = "";
         for (let i = 0; i < results.data.length; i++) {
             twitterUserResultLength++
-            concatenatedText += results.data[i].text;
+            // concatenatedText += results.data[i].text;
             twittetUserTweets.push(results.data[i].text);
         }
         twittetUserTweets.push(concatenatedText);
@@ -39,6 +39,10 @@ function getTweetsByUser(twitterUser) {
    // This api returns an "emotion" object that contains the following keys: value pairs - happy, sad, angry, fear, excited :? Floating Point Number totaling to 1.0
    // TODO: The api produces a batch of tweets which is lengthy, as such a loading screen must be implemented
 function analyzeText(text) {
+    console.log(text.join('","'))
+    sanitizedTweets = text.map(x => {
+        x.replace(regexPattern,'')
+    })
     arrayOfEmotions = []
     const apiKey = "76WGwi6v7KV8wqTAnDd8desN3aAoaDPqBLFz5Mbzhp8";
     fetch("https://apis.paralleldots.com/v5/emotion_batch", {
@@ -50,14 +54,15 @@ function analyzeText(text) {
     })
     .then(response => response.json())
     .then(data => {
-        console.log(data)
         arrayOfEmotions.push(data);
         // subtracting one from the len of arrayOfEmotions because it receives the extra concatenation
         // of the overal sentiment analysis
+        console.log(data)
         if ((arrayOfEmotions.length - 1)  === twitterUserResultLength){
-            console.log(arrayOfEmotions)
+            //TODO: call this to continue flow into player.js
             // setEmotions(arrayOfEmotions)
             console.log(retrivalComplete, twitterUserResultLength, "it's been analyzed")
+            console.log(arrayOfEmotions.length)
         }
     });
 }
