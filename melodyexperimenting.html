@@ -14,7 +14,6 @@
 <body>
     <button onclick="play()">Play</button>
     <button onclick="stop()">Stop Playback</button>
-    <button onclick="restart()">Generate new melody</button>
     <script>
 
         let synth = new Tone.Synth().toDestination()
@@ -90,7 +89,7 @@
             getEmotionMelodies();
             Tone.Transport.stop();
             console.log(synth)
-            if (synth._wasDisposed || synth._synced === true) {
+            if (synth._wasDisposed || synth._synced) {
                 synth.dispose();
                 synth = new Tone.Synth().toDestination()
                 synth.onsilence = function () {
@@ -127,13 +126,10 @@
         // getEmotionMelodies();
 
         function stop() {
-            // synth.dispose() 
-            // synth = new Tone.Synth().toDestination()
+            synth.dispose() 
+            synth = new Tone.Synth().toDestination()
         }
-        function restart() {
-            stop();
-            play();
-        }
+
 
 
 
