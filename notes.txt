@@ -3,12 +3,27 @@ get emotional analysis for each individually
 then an overall to be used for the key
 
 brainstorming how to use emotion results to generate music:
-angry- more randomness
-excited- faster tempo
-fear- diminished/augmented
-happy- major
-indifferent- smaller note range
-sad- minor
+______________________________________________________________
+(8 notes per tweet) 
+example:
+[us]
+    10 * 8 = 80
+[rnn]
+    gets [us] amount of notes for input i.e 80
+---------------------------------------------------------------
+angry - lower octave (min = 0.1, max = 1.0)
+
+excited - [2 octaves, major] (min = 0.1, max = 0.5)
+
+fear - [ minor, faster ] (min = 0.3, max = 0.5)
+
+sad - [minor, slower] (min = 0.5, max = 1.5)
+
+happy - base [major] (min = 0.5 , max = 1.0)
+
+indifferent - [ root, second ] (2 notes) (min = 0.5, max = 0.5)
+
+______________________________________________________________
 
 references on characterization of keys:
 Christian Friedrich Daniel Schubart's musical treatise:

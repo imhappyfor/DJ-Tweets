@@ -51,7 +51,8 @@
         function getNotes(transposition) {
             seedSequence.notes = []
             startTime = 0
-            for (let i = 0; i < 2; i++) {
+            notesPerTweet = 1
+            for (let i = 0; i < notesPerTweet; i++) {
                 let newNoteLength = returnNoteLength();
                 let note = { pitch: returnNote() + transposition, startTime: startTime, endTime: startTime + newNoteLength }
                 seedSequence.notes.push(note);
