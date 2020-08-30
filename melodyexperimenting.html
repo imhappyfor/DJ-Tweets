@@ -16,11 +16,12 @@
     <button onclick="stop()">Stop Playback</button>
     <button onclick="restart()">Generate new melody</button>
     <script>
-        
+
         let synth = new Tone.Synth().toDestination()
 
-        synth.onsilence = function(){
+        synth.onsilence = function () {
             console.log('test')
+            synth.dispose()
             stop()
         }
         let cmajor = [60, 62, 64, 65, 67, 69, 71, 72, 74, 76, 77, 79, 81, 83, 84];
@@ -86,16 +87,18 @@
         }
 
         async function play() {
-            
+            getEmotionMelodies();
             Tone.Transport.stop();
-            // if (synth._wasDisposed) {
-            //     console.log('yo')
-            //     synth = new Tone.Synth().toDestination()
-            //     synth.onsilence = function(){
-            //     // stop()
-            //     }
-            //     // getEmotionMelodies();
-            // }
+            console.log(synth)
+            if (synth._wasDisposed) {
+                synth = new Tone.Synth().toDestination()
+                synth.onsilence = function () {
+                    console.log('test')
+                    synth.dispose()
+                    stop()
+                }
+            }
+
             await music_rnn.initialize();
             // the generated melody is USUALLY in the key of the chord passed, sometimes in a closely related key like the 5th or relative major/minor
             // seems to accept most chord notation, ex. cm CM Cm F#m 
@@ -104,7 +107,7 @@
             seedSequence.totalQuantizedSteps = qns.notes[qns.notes.length - 1].quantizedEndStep;
             let sample = await music_rnn.continueSequence(seedSequence, 10, 1.5, ['Cm'])
             sample.notes.forEach(note => {
-                
+
                 note.quantizedStartStep += qns.notes[qns.notes.length - 1].quantizedEndStep
                 note.quantizedEndStep += qns.notes[qns.notes.length - 1].quantizedEndStep
             })
@@ -112,7 +115,7 @@
             let allNotes = seedSequence.notes.concat(unquantizedSample.notes)
             sample.notes = allNotes;
             synth.sync();
-            
+
             await sample.notes.forEach(async (note) => {
                 console.log(note.startTime)
                 synth.triggerAttackRelease(Tonal.Note.fromMidi(note.pitch), note.endTime - note.startTime, note.startTime)
@@ -120,13 +123,13 @@
             Tone.Transport.start();
             Tone.start();
         }
-        getEmotionMelodies();
+        // getEmotionMelodies();
 
         function stop() {
             // synth.dispose() 
             // synth = new Tone.Synth().toDestination()
         }
-        function restart(){
+        function restart() {
             stop();
             play();
         }
