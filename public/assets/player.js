@@ -153,90 +153,90 @@ function getEmotionMelodies() {
 
 async function play() {
     emotionsArray = [];
-    let emotionsUnfilteredArray = exportEmotions()[0].emotion;
+    // let emotionsUnfilteredArray = exportEmotions()[0].emotion;
     // for testing without api calls
-    // let emotionsUnfilteredArray = [
-    //     {
-    //         angry: 0.99975,
-    //         excited: 0.000021,
-    //         fear: 0.000049,
-    //         happy: 0.000012,
-    //         indifferent: 0.000147,
-    //         sad: 0.000021
-    //     },
-    //     {
-    //         angry: 0.99975,
-    //         excited: 0.000021,
-    //         fear: 0.000049,
-    //         happy: 0.000012,
-    //         indifferent: 0.000147,
-    //         sad: 0.000021
-    //     },
-    //     {
-    //         angry: 0.000002,
-    //         excited: 0.999982,
-    //         fear: 0.000003,
-    //         happy: 0.000008,
-    //         indifferent: 0.000003,
-    //         sad: 0.000002
-    //     },
-    //     {
-    //         happy: 0.99975,
-    //         excited: 0.000021,
-    //         fear: 0.000049,
-    //         angry: 0.000012,
-    //         indifferent: 0.000147,
-    //         sad: 0.000021
-    //     },
-    //     {
-    //         angry: 0.000005,
-    //         excited: 0.000005,
-    //         fear: 0.000001,
-    //         happy: 0.000016,
-    //         indifferent: 0.99997,
-    //         sad: 0.000003
-    //     },
-    //     {
-    //         angry: 0.000005,
-    //         excited: 0.000005,
-    //         fear: 0.000001,
-    //         happy: 0.000016,
-    //         indifferent: 0.99997,
-    //         sad: 0.000003
-    //     },
-    //     {
-    //         happy: 0.99975,
-    //         excited: 0.000021,
-    //         fear: 0.000049,
-    //         angry: 0.000012,
-    //         indifferent: 0.000147,
-    //         sad: 0.000021
-    //     },
-    //     {
-    //         fear: 0.99975,
-    //         excited: 0.000021,
-    //         angry: 0.000049,
-    //         happy: 0.000012,
-    //         indifferent: 0.000147,
-    //         sad: 0.000021
-    //     },
-    //     {
-    //         sad: 0.99975,
-    //         excited: 0.000021,
-    //         fear: 0.000049,
-    //         happy: 0.000012,
-    //         indifferent: 0.000147,
-    //         angry: 0.000021
-    //     },
-    //     {
-    //         fear: 0.99975,
-    //         happy: 0.000021,
-    //         excited: 0.000049,
-    //         indifferent: 0.000012,
-    //         angry: 0.000147,
-    //         sad: 0.000021
-    //     },
-    // ]
+    let emotionsUnfilteredArray = [
+        {
+            angry: 0.99975,
+            excited: 0.000021,
+            fear: 0.000049,
+            happy: 0.000012,
+            indifferent: 0.000147,
+            sad: 0.000021
+        },
+        {
+            angry: 0.99975,
+            excited: 0.000021,
+            fear: 0.000049,
+            happy: 0.000012,
+            indifferent: 0.000147,
+            sad: 0.000021
+        },
+        {
+            angry: 0.000002,
+            excited: 0.999982,
+            fear: 0.000003,
+            happy: 0.000008,
+            indifferent: 0.000003,
+            sad: 0.000002
+        },
+        {
+            happy: 0.99975,
+            excited: 0.000021,
+            fear: 0.000049,
+            angry: 0.000012,
+            indifferent: 0.000147,
+            sad: 0.000021
+        },
+        {
+            angry: 0.000005,
+            excited: 0.000005,
+            fear: 0.000001,
+            happy: 0.000016,
+            indifferent: 0.99997,
+            sad: 0.000003
+        },
+        {
+            angry: 0.000005,
+            excited: 0.000005,
+            fear: 0.000001,
+            happy: 0.000016,
+            indifferent: 0.99997,
+            sad: 0.000003
+        },
+        {
+            happy: 0.99975,
+            excited: 0.000021,
+            fear: 0.000049,
+            angry: 0.000012,
+            indifferent: 0.000147,
+            sad: 0.000021
+        },
+        {
+            fear: 0.99975,
+            excited: 0.000021,
+            angry: 0.000049,
+            happy: 0.000012,
+            indifferent: 0.000147,
+            sad: 0.000021
+        },
+        {
+            sad: 0.99975,
+            excited: 0.000021,
+            fear: 0.000049,
+            happy: 0.000012,
+            indifferent: 0.000147,
+            angry: 0.000021
+        },
+        {
+            fear: 0.99975,
+            happy: 0.000021,
+            excited: 0.000049,
+            indifferent: 0.000012,
+            angry: 0.000147,
+            sad: 0.000021
+        },
+    ]
     for (let i = 0; i < emotionsUnfilteredArray.length; i++) {
         // find dominant emotion by finding emotion with highest value in object
         let allValues = Object.values(emotionsUnfilteredArray[i]);
@@ -246,14 +246,14 @@ async function play() {
     }
     getEmotionMelodies();
     Tone.Transport.stop();
-
     if (synth._wasDisposed || synth._synced) {
         synth.dispose();
         synth = new Tone.Synth().toDestination()
         synth.onsilence = function () {
             console.log('test')
-            synth.dispose()
-            stop()
+            synth.unsync();
+            synth.dispose();
+            stop();
         }
     }
 
@@ -271,15 +271,37 @@ async function play() {
     let unquantizedSample = mm.sequences.unquantizeSequence(sample, 120);
     let allNotes = seedSequence.notes.concat(unquantizedSample.notes)
     sample.notes = allNotes;
-    synth.sync();
+    // send the musical data to sketch.js
+    
+    // synth.sync();
     await sample.notes.forEach(async (note) => {
-        synth.triggerAttackRelease(Tonal.Note.fromMidi(note.pitch), note.endTime - note.startTime, note.startTime)
+        synth.triggerAttackRelease(Tonal.Note.fromMidi(note.pitch), note.endTime - note.startTime, note.startTime)    
     })
-    Tone.Transport.start();
+    
+    // Tone.Transport.start();
     Tone.start();
+    notesToSketch(sample.notes)
 }
 
 function stop() {
+    stopDraw();
+    // console.log(Tone.Transport)
+    // // synth.context.transport.cancel()
+    // console.log("before dispose")
+    // // console.log(synth.context.transport._scheduledEvents)
     synth.dispose();
+    // console.log("after dispose")
+    // console.log(synth)
+    // console.log("before context.transport.dipose")
+    // // synth.context.transport.dispose();
+    // console.log(synth)
+    // console.log("after all")
+    // worth it
+    // Tone.Transport.cancel(0)
+    
+    
+    // synth.unsync();
+    // Tone.Transport.stop();
+    // console.log(Tone.Transport)
     synth = new Tone.Synth().toDestination();
 }

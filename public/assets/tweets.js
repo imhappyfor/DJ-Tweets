@@ -55,6 +55,8 @@ function analyzeText(text) {
         // subtracting one from the len of arrayOfEmotions because it receives the extra concatenation
         // of the overal sentiment analysis
         console.log(data)
+        // console.log(arrayOfEmotions)
+        // console.log(twitterUserResultLength)
         if ((arrayOfEmotions.length - 1)  === twitterUserResultLength){
             //TODO: call this to continue flow into player.js
             // setEmotions(arrayOfEmotions)

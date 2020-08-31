@@ -1,5 +1,6 @@
 body {
     background: rgb(24, 37, 49);
+    margin: 0 0;
 }
 #controls {
 display: flex;
@@ -27,4 +28,10 @@ button {
 button:active {
     background: rgb(11, 79, 143);
     transform: translateY(3px);
+}
+canvas {
+    /* margin: 0 auto; */
+}
+main {
+    margin: 0;
 }
