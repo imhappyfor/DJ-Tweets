@@ -31,6 +31,7 @@ let seedSequence = {
 }
 
 // these variables apply to the overall structure of the melodies, are global because they need to be available to multiple functions
+let dominantEmotion;
 let transposition;
 let continueSequenceChord;
 // anything above 1.5 will essentially result in random results.
@@ -72,14 +73,15 @@ function getOverallEmotion() {
             current = 1;
         }
     };
+    dominantEmotion = max.value;
     getTransposition(max.value);
 }
 
-function getNotes(scale, indexArray, minNoteLength, maxNoteLength) {
+function getNotes(scale, indexArray, minNoteLength, maxNoteLength, emotion) {
     let notesPerTweet = 8;
     for (let i = 0; i < notesPerTweet; i++) {
         let newNoteLength = returnNoteLength(minNoteLength, maxNoteLength);
-        let note = { pitch: returnNote(scale, indexArray) + transposition, startTime: startTime, endTime: startTime + newNoteLength }
+        let note = { pitch: returnNote(scale, indexArray) + transposition, startTime: startTime, endTime: startTime + newNoteLength, emotion }
         seedSequence.notes.push(note);
         startTime += newNoteLength;
     }
@@ -100,7 +102,7 @@ function getTransposition(dominantEmotion) {
         case "excited":
             continueSequenceChord = ['GM'];
             continueSequenceTemperature = 1.5;
-            transposition = 5;
+            transposition = -5;
             break;
         case "indifferent":
             continueSequenceChord = ['CM'];
@@ -147,45 +149,52 @@ function getMelodiesByEmotion() {
                 maxNoteLength = 0.3;
                 scale = major;
                 indexArray = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14];
+                emotion = "excited";
                 break;
             case "indifferent":
                 minNoteLength = 0.5;
                 maxNoteLength = 0.5;
                 scale = major;
                 indexArray = [0,1];
+                emotion = "indifferent";
                 break;
             case "angry": 
                 minNoteLength = 0.1;
                 maxNoteLength = 0.8;
                 scale = major;
                 indexArray = [0,1,2,3,4,5,6,7];
+                emotion = "angry";
                 break;
             case "happy":
                 minNoteLength = 0.3;
                 maxNoteLength = 1.0;
                 scale = major;
                 indexArray = [0,2,4,7,9,11];
+                emotion = "happy";
                 break;
             case "fear":
                 minNoteLength = 0.1;
                 maxNoteLength = 0.5;
                 scale = minor;
                 indexArray = [7,8,9,10,11,12,13,14];
+                emotion = "fear";
                 break;
             case "sad":
                 minNoteLength = 0.5;
                 maxNoteLength = 1.0;
                 scale = minor;
                 indexArray = [0,1,2,3,4,5,6,7];
+                emotion = "sad";
                 break;
             default:
                 minNoteLength = 0.5;
                 maxNoteLength = 1.5;
                 scale = major;
                 indexArray = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14];
+                emotion = "broken";
                 break;
         }
-        getNotes(scale, indexArray, minNoteLength, maxNoteLength)
+        getNotes(scale, indexArray, minNoteLength, maxNoteLength, emotion)
     }
 }
 
@@ -198,6 +207,7 @@ async function getFullMelody() {
     sample.notes.forEach(note => {
         note.startTime += qns.notes[qns.notes.length - 1].endTime;
         note.endTime += qns.notes[qns.notes.length - 1].endTime;
+        note.emotion = dominantEmotion;
     })
     // combine the two sequences
     let allNotes = seedSequence.notes.concat(sample.notes)
