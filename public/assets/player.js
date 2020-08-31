@@ -4,7 +4,11 @@
 // generates notes
 // Plays notes
 // Stops playback
+
+// Initialize synthesizer from Tone.js to use for playback
 let synth = new Tone.Synth().toDestination();
+// Initialize the musicrnn model.
+music_rnn = new mm.MusicRNN('https://storage.googleapis.com/magentadata/js/checkpoints/music_rnn/chord_pitches_improv');
 
 // callback to dispose of synth once it has stopped playing
 synth.onsilence = function () {
@@ -15,7 +19,7 @@ synth.onsilence = function () {
 let major = [60, 62, 64, 65, 67, 69, 71, 72, 74, 76, 77, 79, 81, 83, 84];
 let minor = [60, 62, 63, 65, 67, 68, 70, 72, 74, 75, 77, 79, 80, 82, 84];
 let emotionsArray = [];
-let startTime = 0;
+let startTime;
 let endTime;
 let seedSequence = {
     totalQuantizedSteps: null,
@@ -26,15 +30,13 @@ let seedSequence = {
     notes: []
 }
 
-// these variables values will be determined by emotional content of each tweet
-let minNoteLength;
-let maxNoteLength;
-let keyTransposition;
+// these variables apply to the overall structure of the melodies, are global because they need to be available to multiple functions
+let transposition;
 let continueSequenceChord;
 // anything above 1.5 will essentially result in random results.
-let continueSequenceTemperature
+let continueSequenceTemperature;
 
-// TODO: generate notes from emotion.
+// gets emotional analysis from tweets.js and finds maximum values from each object to determine dominant emotion
 function setEmotions(data) {
     let unfilteredEmotionsArray = data
     for (let i = 0; i < unfilteredEmotionsArray.length; i++) {
@@ -44,17 +46,39 @@ function setEmotions(data) {
         let emotion = Object.keys(unfilteredEmotionsArray[i]).find(key => unfilteredEmotionsArray[i][key] === max);
         emotionsArray.push(emotion);
     }
-    console.log(emotionsArray);
+    getOverallEmotion();
     getMelodiesByEmotion();
 }
 
-// Initialize the model.
-music_rnn = new mm.MusicRNN('https://storage.googleapis.com/magentadata/js/checkpoints/music_rnn/chord_pitches_improv');
+// this function finds the most commonly occurring emotion of all the tweets to set larger variables that affect the individual tweet melodies
+// if there are multiple emotions with the same amount of occurrences, the first one that occurrs in alphabetical order would be used. A future improvement would be developing nuances for ties in dominant emotions
+function getOverallEmotion() {
+    // created sort copy of emotions array without modifying original array
+    let sortedEmotions = [...emotionsArray].sort();
+    let max = {
+        value: sortedEmotions[0],
+        total: 1
+    };
+    let current = 1;
+    for (let i = 1; i < sortedEmotions.length; i++) {
+        if (sortedEmotions[i] === sortedEmotions[i-1]) {
+            current++;
+            if (current > max.total) {
+                max.value = sortedEmotions[i];
+                max.total = current;
+            }
+        }
+        else {
+            current = 1;
+        }
+    };
+    getTransposition(max.value);
+}
 
-function getNotes(transposition, scale, indexArray) {
-    notesPerTweet = 8;
+function getNotes(scale, indexArray, minNoteLength, maxNoteLength) {
+    let notesPerTweet = 8;
     for (let i = 0; i < notesPerTweet; i++) {
-        let newNoteLength = returnNoteLength();
+        let newNoteLength = returnNoteLength(minNoteLength, maxNoteLength);
         let note = { pitch: returnNote(scale, indexArray) + transposition, startTime: startTime, endTime: startTime + newNoteLength }
         seedSequence.notes.push(note);
         startTime += newNoteLength;
@@ -67,47 +91,55 @@ function returnNote(scale, indexArray) {
     return scale[scaleIndex];
 }
 
-function returnNoteLength() {
+function returnNoteLength(minNoteLength, maxNoteLength) {
     let noteLength = Math.random() * (maxNoteLength - minNoteLength) + minNoteLength;
     return noteLength
 }
-function getTransposition(overallEmotion) {
-    switch(overallEmotion) {
+function getTransposition(dominantEmotion) {
+    switch(dominantEmotion) {
         case "excited":
             continueSequenceChord = ['GM'];
             continueSequenceTemperature = 1.5;
-            return -5;
+            transposition = 5;
+            break;
         case "indifferent":
             continueSequenceChord = ['CM'];
             continueSequenceTemperature = 0.9;
-            return -12;
+            transposition = -12;
+            break;
         case "angry": 
             continueSequenceChord = ['BM'];
             continueSequenceTemperature = 1.25;
-            return -1;
+            transposition = -1;
+            break;
         case "happy":
             continueSequenceChord = ['BbM'];
             continueSequenceTemperature = 1.1;
-            return -2;
+            transposition = -2;
+            break;
         case "fear":
             continueSequenceChord = ['gm'];
             continueSequenceTemperature = 1.5;
-            return -5;
+            transposition = -5;
+            break;
         case "sad":
             continueSequenceChord = ['ebm'];
             continueSequenceTemperature = 0.5;
-            return -9;
+            transposition = -9;
+            break;
         default:
             continueSequenceChord = ['CM'];
             continueSequenceTemperature = 1.5;
-            return -12;
+            transposition = -12;
+            break;
     }
 }
 
 function getMelodiesByEmotion() {
     startTime = 0;
     seedSequence.notes = [];
-    keyTransposition = getTransposition(emotionsArray[emotionsArray.length-1]);
+    let minNoteLength;
+    let maxNoteLength;
     for (let i = 0; i < emotionsArray.length-1; i++) {
         switch(emotionsArray[i]) {
             case "excited":
@@ -153,17 +185,21 @@ function getMelodiesByEmotion() {
                 indexArray = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14];
                 break;
         }
-        getNotes(keyTransposition, scale, indexArray)
+        getNotes(scale, indexArray, minNoteLength, maxNoteLength)
     }
 }
 
-async function quantizeEmotionMelodies() {
+async function getFullMelody() {
+    // we must quantize our seedSequence/melodies based on emotion so it can be based to the musicrnn continueSequence
     let qns = mm.sequences.quantizeNoteSequence(seedSequence, 4);
+    // here we pass our quantized note sequence to continueSequence to generate a continuation
     let sample = await continueSequence(qns);
+    // because we want to join our generated melodies with musicrnn's melody, we must adjust the start and end times of the generated melody to line up with the end of ours
     sample.notes.forEach(note => {
         note.startTime += qns.notes[qns.notes.length - 1].endTime;
         note.endTime += qns.notes[qns.notes.length - 1].endTime;
     })
+    // combine the two sequences
     let allNotes = seedSequence.notes.concat(sample.notes)
     sample.notes = allNotes;
     return sample;
@@ -172,9 +208,11 @@ async function quantizeEmotionMelodies() {
 async function continueSequence(qns) {
     // musicrnn continues in quantized steps so probably will not equal number of notes... we may want to make it a little longer to compensate
     let continueSequenceSteps = 80;
+    // we must set totalQuantizedSteps to be accepted by musicrnn
     seedSequence.totalQuantizedSteps = qns.notes[qns.notes.length - 1].quantizedEndStep;
     // args: input sequence, how many steps into the future, temperature/how random, chord structure
     let sample = await music_rnn.continueSequence(seedSequence, continueSequenceSteps, continueSequenceTemperature, continueSequenceChord);
+    // we must now unquantize this melody so our player will accept it... with just quantized start and end steps it will play at the wrong speed so we must get start and end times
     let unquantizedSample = mm.sequences.unquantizeSequence(sample, 120);
     return unquantizedSample;
 }
@@ -194,7 +232,7 @@ async function play() {
     }
 
     await music_rnn.initialize();
-    let sample = await quantizeEmotionMelodies();
+    let sample = await getFullMelody();
     // // send the musical data to sketch.js
     // // this line below and Tone.Transport.start() need to be uncommented in order to be able to hit play multiple times
     synth.sync();
