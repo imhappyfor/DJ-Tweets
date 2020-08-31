@@ -31,7 +31,7 @@ let seedSequence = {
 }
 
 // these variables apply to the overall structure of the melodies, are global because they need to be available to multiple functions
-let dominantEmotion;
+let overallEmotionEmoji;
 let transposition;
 let continueSequenceChord;
 // anything above 1.5 will essentially result in random results.
@@ -73,7 +73,6 @@ function getOverallEmotion() {
             current = 1;
         }
     };
-    dominantEmotion = max.value;
     getTransposition(max.value);
 }
 
@@ -103,36 +102,43 @@ function getTransposition(dominantEmotion) {
             continueSequenceChord = ['GM'];
             continueSequenceTemperature = 1.5;
             transposition = -5;
+            overallEmotionEmoji = "😃";
             break;
         case "indifferent":
             continueSequenceChord = ['CM'];
             continueSequenceTemperature = 0.9;
             transposition = -12;
+            overallEmotionEmoji = "😐";
             break;
         case "angry": 
             continueSequenceChord = ['BM'];
             continueSequenceTemperature = 1.25;
             transposition = -1;
+            overallEmotionEmoji = "😡";
             break;
         case "happy":
             continueSequenceChord = ['BbM'];
             continueSequenceTemperature = 1.1;
             transposition = -2;
+            overallEmotionEmoji = "🙂";
             break;
         case "fear":
             continueSequenceChord = ['gm'];
             continueSequenceTemperature = 1.5;
             transposition = -5;
+            overallEmotionEmoji = "😧";
             break;
         case "sad":
             continueSequenceChord = ['ebm'];
             continueSequenceTemperature = 0.5;
             transposition = -9;
+            overallEmotionEmoji = "😢";
             break;
         default:
             continueSequenceChord = ['CM'];
             continueSequenceTemperature = 1.5;
             transposition = -12;
+            overallEmotionEmoji = "🤪";
             break;
     }
 }
@@ -149,49 +155,49 @@ function getMelodiesByEmotion() {
                 maxNoteLength = 0.3;
                 scale = major;
                 indexArray = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14];
-                emotion = "excited";
+                emotion = "😃";
                 break;
             case "indifferent":
                 minNoteLength = 0.5;
                 maxNoteLength = 0.5;
                 scale = major;
                 indexArray = [0,1];
-                emotion = "indifferent";
+                emotion = "😐";
                 break;
             case "angry": 
                 minNoteLength = 0.1;
                 maxNoteLength = 0.8;
                 scale = major;
                 indexArray = [0,1,2,3,4,5,6,7];
-                emotion = "angry";
+                emotion = "😡";
                 break;
             case "happy":
                 minNoteLength = 0.3;
                 maxNoteLength = 1.0;
                 scale = major;
                 indexArray = [0,2,4,7,9,11];
-                emotion = "happy";
+                emotion = "🙂";
                 break;
             case "fear":
                 minNoteLength = 0.1;
                 maxNoteLength = 0.5;
                 scale = minor;
                 indexArray = [7,8,9,10,11,12,13,14];
-                emotion = "fear";
+                emotion = "😧";
                 break;
             case "sad":
                 minNoteLength = 0.5;
                 maxNoteLength = 1.0;
                 scale = minor;
                 indexArray = [0,1,2,3,4,5,6,7];
-                emotion = "sad";
+                emotion = "😢";
                 break;
             default:
                 minNoteLength = 0.5;
                 maxNoteLength = 1.5;
                 scale = major;
                 indexArray = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14];
-                emotion = "broken";
+                emotion = "🤪";
                 break;
         }
         getNotes(scale, indexArray, minNoteLength, maxNoteLength, emotion)
@@ -207,7 +213,7 @@ async function getFullMelody() {
     sample.notes.forEach(note => {
         note.startTime += qns.notes[qns.notes.length - 1].endTime;
         note.endTime += qns.notes[qns.notes.length - 1].endTime;
-        note.emotion = dominantEmotion;
+        note.emotion = overallEmotionEmoji;
     })
     // combine the two sequences
     let allNotes = seedSequence.notes.concat(sample.notes)
