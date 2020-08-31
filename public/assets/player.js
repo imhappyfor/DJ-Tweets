@@ -17,7 +17,6 @@ let minor = [60, 62, 63, 65, 67, 68, 70, 72, 74, 75, 77, 79, 80, 82, 84];
 let emotionsArray = [];
 let startTime = 0;
 let endTime;
-let totalTime;
 let seedSequence = {
     totalQuantizedSteps: null,
     quantizationInfo: {
@@ -36,15 +35,24 @@ let continueSequenceChord;
 let continueSequenceTemperature
 
 // TODO: generate notes from emotion.
-// function setEmotions(data){
-//     emotionsArray = data
-// }
+function setEmotions(data) {
+    let unfilteredEmotionsArray = data
+    for (let i = 0; i < unfilteredEmotionsArray.length; i++) {
+        // find dominant emotion by finding emotion with highest value in object
+        let allValues = Object.values(unfilteredEmotionsArray[i]);
+        let max = Math.max(...allValues);
+        let emotion = Object.keys(unfilteredEmotionsArray[i]).find(key => unfilteredEmotionsArray[i][key] === max);
+        emotionsArray.push(emotion);
+    }
+    console.log(emotionsArray);
+    getMelodiesByEmotion();
+}
 
 // Initialize the model.
 music_rnn = new mm.MusicRNN('https://storage.googleapis.com/magentadata/js/checkpoints/music_rnn/chord_pitches_improv');
 
 function getNotes(transposition, scale, indexArray) {
-    notesPerTweet = 6;
+    notesPerTweet = 8;
     for (let i = 0; i < notesPerTweet; i++) {
         let newNoteLength = returnNoteLength();
         let note = { pitch: returnNote(scale, indexArray) + transposition, startTime: startTime, endTime: startTime + newNoteLength }
@@ -64,7 +72,6 @@ function returnNoteLength() {
     return noteLength
 }
 function getTransposition(overallEmotion) {
-    // console.log(overallEmotion)
     switch(overallEmotion) {
         case "excited":
             continueSequenceChord = ['GM'];
@@ -97,11 +104,10 @@ function getTransposition(overallEmotion) {
     }
 }
 
-function getEmotionMelodies() {
+function getMelodiesByEmotion() {
     startTime = 0;
     seedSequence.notes = [];
     keyTransposition = getTransposition(emotionsArray[emotionsArray.length-1]);
-    // console.log(emotionsArray)
     for (let i = 0; i < emotionsArray.length-1; i++) {
         switch(emotionsArray[i]) {
             case "excited":
@@ -151,106 +157,36 @@ function getEmotionMelodies() {
     }
 }
 
+async function quantizeEmotionMelodies() {
+    let qns = mm.sequences.quantizeNoteSequence(seedSequence, 4);
+    let sample = await continueSequence(qns);
+    sample.notes.forEach(note => {
+        note.startTime += qns.notes[qns.notes.length - 1].endTime;
+        note.endTime += qns.notes[qns.notes.length - 1].endTime;
+    })
+    let allNotes = seedSequence.notes.concat(sample.notes)
+    sample.notes = allNotes;
+    return sample;
+}
+
+async function continueSequence(qns) {
+    // musicrnn continues in quantized steps so probably will not equal number of notes... we may want to make it a little longer to compensate
+    let continueSequenceSteps = 80;
+    seedSequence.totalQuantizedSteps = qns.notes[qns.notes.length - 1].quantizedEndStep;
+    // args: input sequence, how many steps into the future, temperature/how random, chord structure
+    let sample = await music_rnn.continueSequence(seedSequence, continueSequenceSteps, continueSequenceTemperature, continueSequenceChord);
+    let unquantizedSample = mm.sequences.unquantizeSequence(sample, 120);
+    return unquantizedSample;
+}
+
 async function play() {
-    emotionsArray = [];
-    // let emotionsUnfilteredArray = exportEmotions()[0].emotion;
-    // for testing without api calls
-    let emotionsUnfilteredArray = [
-        {
-            angry: 0.99975,
-            excited: 0.000021,
-            fear: 0.000049,
-            happy: 0.000012,
-            indifferent: 0.000147,
-            sad: 0.000021
-        },
-        {
-            angry: 0.99975,
-            excited: 0.000021,
-            fear: 0.000049,
-            happy: 0.000012,
-            indifferent: 0.000147,
-            sad: 0.000021
-        },
-        {
-            angry: 0.000002,
-            excited: 0.999982,
-            fear: 0.000003,
-            happy: 0.000008,
-            indifferent: 0.000003,
-            sad: 0.000002
-        },
-        {
-            happy: 0.99975,
-            excited: 0.000021,
-            fear: 0.000049,
-            angry: 0.000012,
-            indifferent: 0.000147,
-            sad: 0.000021
-        },
-        {
-            angry: 0.000005,
-            excited: 0.000005,
-            fear: 0.000001,
-            happy: 0.000016,
-            indifferent: 0.99997,
-            sad: 0.000003
-        },
-        {
-            angry: 0.000005,
-            excited: 0.000005,
-            fear: 0.000001,
-            happy: 0.000016,
-            indifferent: 0.99997,
-            sad: 0.000003
-        },
-        {
-            happy: 0.99975,
-            excited: 0.000021,
-            fear: 0.000049,
-            angry: 0.000012,
-            indifferent: 0.000147,
-            sad: 0.000021
-        },
-        {
-            fear: 0.99975,
-            excited: 0.000021,
-            angry: 0.000049,
-            happy: 0.000012,
-            indifferent: 0.000147,
-            sad: 0.000021
-        },
-        {
-            sad: 0.99975,
-            excited: 0.000021,
-            fear: 0.000049,
-            happy: 0.000012,
-            indifferent: 0.000147,
-            angry: 0.000021
-        },
-        {
-            fear: 0.99975,
-            happy: 0.000021,
-            excited: 0.000049,
-            indifferent: 0.000012,
-            angry: 0.000147,
-            sad: 0.000021
-        },
-    ]
-    for (let i = 0; i < emotionsUnfilteredArray.length; i++) {
-        // find dominant emotion by finding emotion with highest value in object
-        let allValues = Object.values(emotionsUnfilteredArray[i]);
-        let max = Math.max(...allValues);
-        let emotion = Object.keys(emotionsUnfilteredArray[i]).find(key => emotionsUnfilteredArray[i][key] === max);
-        emotionsArray.push(emotion);
-    }
-    getEmotionMelodies();
+    getMelodiesByEmotion();
+
     Tone.Transport.stop();
     if (synth._wasDisposed || synth._synced) {
         synth.dispose();
         synth = new Tone.Synth().toDestination()
         synth.onsilence = function () {
-            console.log('test')
             synth.unsync();
             synth.dispose();
             stop();
@@ -258,28 +194,16 @@ async function play() {
     }
 
     await music_rnn.initialize();
-    // musicrnn continues in quantized steps so probably will not equal number of notes... we may want to make it a little longer to compensate
-    let continueSequenceSteps = (notesPerTweet * emotionsArray.length) * 2;
-    let qns = mm.sequences.quantizeNoteSequence(seedSequence, 4);
-    seedSequence.totalQuantizedSteps = qns.notes[qns.notes.length - 1].quantizedEndStep;
-    // args: input sequence, how many steps into the future, temperature/how random, chord structure
-    let sample = await music_rnn.continueSequence(seedSequence, continueSequenceSteps, continueSequenceTemperature, continueSequenceChord)
-    sample.notes.forEach(note => {
-        note.quantizedStartStep += qns.notes[qns.notes.length - 1].quantizedEndStep
-        note.quantizedEndStep += qns.notes[qns.notes.length - 1].quantizedEndStep
-    })
-    let unquantizedSample = mm.sequences.unquantizeSequence(sample, 120);
-    let allNotes = seedSequence.notes.concat(unquantizedSample.notes)
-    sample.notes = allNotes;
-    // send the musical data to sketch.js
-    
-    // synth.sync();
+    let sample = await quantizeEmotionMelodies();
+    // // send the musical data to sketch.js
+    // // this line below and Tone.Transport.start() need to be uncommented in order to be able to hit play multiple times
+    synth.sync();
     await sample.notes.forEach(async (note) => {
         synth.triggerAttackRelease(Tonal.Note.fromMidi(note.pitch), note.endTime - note.startTime, note.startTime)    
     })
     
-    // Tone.Transport.start();
     Tone.start();
+    Tone.Transport.start();
     notesToSketch(sample.notes)
 }
 
