@@ -36,14 +36,14 @@ function getTweetsByUser(twitterUser) {
    // This api returns an "emotion" object that contains the following keys: value pairs - happy, sad, angry, fear, excited :? Floating Point Number totaling to 1.0
    // TODO: The api produces a batch of tweets which is lengthy, as such a loading screen must be implemented
 function analyzeText(text) {
-    console.log(text.join('","'))
-    sanitizedTweets = text.map(x => {
-        x.replace(regexPattern,'')
-    })
+    for (let i = 0; i < text.length; i++) {
+        text[i] = text[i].replace(/['’"”“&@:;]/g, "")
+    }
+    joinedTweets = "[" + '"' + text.join('","') + '"' + "]";
     arrayOfEmotions = []
     const apiKey = "76WGwi6v7KV8wqTAnDd8desN3aAoaDPqBLFz5Mbzhp8";
     fetch("https://apis.paralleldots.com/v5/emotion_batch", {
-        body: `api_key=${apiKey}&text=["${text.join('","')}"]`,
+        body: `api_key=${apiKey}&text=` + joinedTweets,
         headers: {
             "Content-Type": "application/x-www-form-urlencoded"
         },
@@ -51,8 +51,9 @@ function analyzeText(text) {
     })
     .then(response => response.json())
     .then(data => {
-        arrayOfEmotions = (data.emotion);
-        if ((arrayOfEmotions.length)  === twitterUserResultLength) {
+        console.log(data)
+        arrayOfEmotions = data.emotion;
+        if (arrayOfEmotions.length  === twitterUserResultLength) {
             setEmotions(arrayOfEmotions);
             console.log(retrivalComplete, twitterUserResultLength, "it's been analyzed")
             console.log(arrayOfEmotions.length)
@@ -96,8 +97,4 @@ function search(){
 // credit goes to @zzzzBov https://stackoverflow.com/questions/14313183/javascript-regex-how-do-i-check-if-the-string-is-ascii-only
 function isASCII(str) {
     return /^[\x00-\x7F]*$/.test(str);
-}
-
-function exportEmotions() {
-    return arrayOfEmotions;
 }
