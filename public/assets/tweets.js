@@ -37,11 +37,19 @@ function getTweetsByUser(twitterUser) {
    // TODO: The api produces a batch of tweets which is lengthy, as such a loading screen must be implemented
 function analyzeText(text) {
     for (let i = 0; i < text.length; i++) {
-        text[i] = text[i].replace(/['’"”“&@:;]/g, "")
+        text[i] = text[i].replace(/['’"”“&@;]/g, "").replace(/\r?\n|\r/g, "").trim();
+        let sanitizedTweet = []
+        for (let j = 0; j < text[i].length; j++) {
+            if (isASCII(text[i][j])) {
+                sanitizedTweet.push(text[i][j])
+            }
+        }
+        text[i] = sanitizedTweet.join(""); 
+        text[i] = text[i].trim();
     }
     joinedTweets = "[" + '"' + text.join('","') + '"' + "]";
-    arrayOfEmotions = []
-    const apiKey = "fnH1snv21JF75jHDbXCDMBKxfPFRKOFab5r3xSWztrU";
+    arrayOfEmotions = [];
+    const apiKey = "76WGwi6v7KV8wqTAnDd8desN3aAoaDPqBLFz5Mbzhp8";
     fetch("https://apis.paralleldots.com/v5/emotion_batch", {
         body: `api_key=${apiKey}&text=` + joinedTweets,
         headers: {
@@ -55,8 +63,6 @@ function analyzeText(text) {
         arrayOfEmotions = data.emotion;
         if (arrayOfEmotions.length  === twitterUserResultLength) {
             setEmotions(arrayOfEmotions, text);
-            console.log(retrivalComplete, twitterUserResultLength, "it's been analyzed")
-            console.log(arrayOfEmotions.length)
         }
     });
 }
