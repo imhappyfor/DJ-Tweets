@@ -54,7 +54,7 @@ function analyzeText(text) {
         console.log(data)
         arrayOfEmotions = data.emotion;
         if (arrayOfEmotions.length  === twitterUserResultLength) {
-            setEmotions(arrayOfEmotions);
+            setEmotions(arrayOfEmotions, text);
             console.log(retrivalComplete, twitterUserResultLength, "it's been analyzed")
             console.log(arrayOfEmotions.length)
         }

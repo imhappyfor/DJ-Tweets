@@ -38,7 +38,7 @@ let continueSequenceChord;
 let continueSequenceTemperature;
 
 // gets emotional analysis from tweets.js and finds maximum values from each object to determine dominant emotion
-function setEmotions(data) {
+function setEmotions(data, tweetArray) {
     let unfilteredEmotionsArray = data
     for (let i = 0; i < unfilteredEmotionsArray.length; i++) {
         // find dominant emotion by finding emotion with highest value in object
@@ -48,7 +48,7 @@ function setEmotions(data) {
         emotionsArray.push(emotion);
     }
     getOverallEmotion();
-    getMelodiesByEmotion();
+    getMelodiesByEmotion(tweetArray);
 }
 
 // this function finds the most commonly occurring emotion of all the tweets to set larger variables that affect the individual tweet melodies
@@ -76,11 +76,11 @@ function getOverallEmotion() {
     getTransposition(max.value);
 }
 
-function getNotes(scale, indexArray, minNoteLength, maxNoteLength, emotion) {
+function getNotes(scale, indexArray, minNoteLength, maxNoteLength, emotion, tweetText) {
     let notesPerTweet = 8;
     for (let i = 0; i < notesPerTweet; i++) {
         let newNoteLength = returnNoteLength(minNoteLength, maxNoteLength);
-        let note = { pitch: returnNote(scale, indexArray) + transposition, startTime: startTime, endTime: startTime + newNoteLength, emotion }
+        let note = { pitch: returnNote(scale, indexArray) + transposition, startTime: startTime, endTime: startTime + newNoteLength, emotion, tweetText }
         seedSequence.notes.push(note);
         startTime += newNoteLength;
     }
@@ -143,7 +143,7 @@ function getTransposition(dominantEmotion) {
     }
 }
 
-function getMelodiesByEmotion() {
+function getMelodiesByEmotion(tweetText) {
     startTime = 0;
     seedSequence.notes = [];
     let minNoteLength;
@@ -156,6 +156,7 @@ function getMelodiesByEmotion() {
                 scale = major;
                 indexArray = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14];
                 emotion = "😃";
+                text = tweetText[i];
                 break;
             case "indifferent":
                 minNoteLength = 0.5;
@@ -163,6 +164,7 @@ function getMelodiesByEmotion() {
                 scale = major;
                 indexArray = [0,1];
                 emotion = "😐";
+                text = tweetText[i];
                 break;
             case "angry": 
                 minNoteLength = 0.1;
@@ -170,6 +172,7 @@ function getMelodiesByEmotion() {
                 scale = major;
                 indexArray = [0,1,2,3,4,5,6,7];
                 emotion = "😡";
+                text = tweetText[i];
                 break;
             case "happy":
                 minNoteLength = 0.3;
@@ -177,6 +180,7 @@ function getMelodiesByEmotion() {
                 scale = major;
                 indexArray = [0,2,4,7,9,11];
                 emotion = "🙂";
+                text = tweetText[i];
                 break;
             case "fear":
                 minNoteLength = 0.1;
@@ -184,6 +188,7 @@ function getMelodiesByEmotion() {
                 scale = minor;
                 indexArray = [7,8,9,10,11,12,13,14];
                 emotion = "😧";
+                text = tweetText[i];
                 break;
             case "sad":
                 minNoteLength = 0.5;
@@ -191,6 +196,7 @@ function getMelodiesByEmotion() {
                 scale = minor;
                 indexArray = [0,1,2,3,4,5,6,7];
                 emotion = "😢";
+                text = tweetText[i];
                 break;
             default:
                 minNoteLength = 0.5;
@@ -198,9 +204,10 @@ function getMelodiesByEmotion() {
                 scale = major;
                 indexArray = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14];
                 emotion = "🤪";
+                text = tweetText[i];
                 break;
         }
-        getNotes(scale, indexArray, minNoteLength, maxNoteLength, emotion)
+        getNotes(scale, indexArray, minNoteLength, maxNoteLength, emotion, text)
     }
 }
 
@@ -214,6 +221,7 @@ async function getFullMelody() {
         note.startTime += qns.notes[qns.notes.length - 1].endTime;
         note.endTime += qns.notes[qns.notes.length - 1].endTime;
         note.emotion = overallEmotionEmoji;
+        note.text = "MusicRNN's interpretation of this user's overall tweet mood";
     })
     // combine the two sequences
     let allNotes = seedSequence.notes.concat(sample.notes)
