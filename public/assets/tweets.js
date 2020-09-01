@@ -51,7 +51,8 @@ function analyzeText(text) {
     }
     joinedTweets = "[" + '"' + text.join('","') + '"' + "]";
     arrayOfEmotions = [];
-    const apiKey = "76WGwi6v7KV8wqTAnDd8desN3aAoaDPqBLFz5Mbzhp8";
+    const apiKey = "GymPIAvUchw63wDyHkBB7TNkf5v5lkarDYJrsOXxkgU";
+
     fetch("https://apis.paralleldots.com/v5/emotion_batch", {
         body: `api_key=${apiKey}&text=` + joinedTweets,
         headers: {
