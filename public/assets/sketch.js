@@ -1,6 +1,24 @@
 function setup(render){
     if(render){
         createCanvas(windowWidth, 500);
+        tweetDiv = document.createElement('div');
+        emotionParagraph = document.createElement('p');
+        tweetParagraph = document.createElement('p');
+        hasReached = false
+        tweetDiv.setAttribute('id','tweetDiv');
+        tweetParagraph.setAttribute('id','tweetParagraph');
+        emotionParagraph.setAttribute('id','emotionParagraph');
+        tweetDiv.style.display = "flex";
+        tweetDiv.style.flexDirection= "column";
+        tweetDiv.style.justifyContent ="center";
+        tweetDiv.style.alignItems = "center";
+        tweetParagraph.style.fontSize = "24px"
+        emotionParagraph.style.fontSize = "24px"
+        tweetParagraph.style.color = 'whitesmoke'
+        emotionParagraph.style.color = 'whitesmoke'
+        tweetDiv.appendChild(emotionParagraph);
+        tweetDiv.appendChild(tweetParagraph);
+        document.body.appendChild(tweetDiv);
     }
 // maxX = Math.floor(windowWidth/2);    
 // maxY = Math.floor(500/2); 
@@ -15,25 +33,15 @@ searchQuery = 'andrewyang'
 musicalData = undefined
 onePass = false
 canDraw = false
-tweetDiv = document.createElement('div');
-emotionParagraph = document.createElement('p');
-tweetParagraph = document.createElement('p');
-hasReached = false
-tweetParagraph.setAttribute('id','tweetParagraph');
-emotionParagraph.setAttribute('id','emotionParagraph');
-tweetDiv.style.display = "flex";
-tweetDiv.style.flexDirection= "column";
-tweetDiv.style.justifyContent ="center";
-tweetDiv.style.alignItems = "center";
-tweetParagraph.style.fontSize = "24px"
-emotionParagraph.style.fontSize = "24px"
-tweetParagraph.style.color = 'whitesmoke'
-emotionParagraph.style.color = 'whitesmoke'
-tweetDiv.appendChild(emotionParagraph);
-tweetDiv.appendChild(tweetParagraph);
-document.body.appendChild(tweetDiv);
+
+
+
+
+
+
 }
 function notesToSketch(data){
+    
     setup(true);
     clear();
     canDraw = true;
@@ -76,7 +84,26 @@ function draw(){
 }
 
 function stopDraw(){
-    musicalData = undefined
+    // musicalData = undefined
+    let emotionParagraph = document.getElementById("emotionParagraph")
+    let tweetParagraph = document.getElementById("tweetParagraph")
+    emotionParagraph.remove()
+    tweetParagraph.remove()
+    // tweetParagraph.remove();
+    // tweetDiv.remove();
+    // add button to refresh div
+
+    let reloadDiv = document.createElement('div');
+    reloadDiv.style.display = "flex";
+    reloadDiv.style.justifyContent ="center";
+    reloadDiv.style.alignItems = "center";
+
+    let reloadButton = document.createElement('button');
+    reloadButton.textContent = 'Try with another user';
+    reloadButton.addEventListener("click",reloadPage);
+
+    reloadDiv.appendChild(reloadButton);
+    document.body.appendChild(reloadDiv);
 }
 
 function updateTweetData(tweetData){
@@ -141,18 +168,16 @@ function drawNotesAndEmotion(a){
             );
 
             if ( musicalData["totalTime"] <= currentTime && !hasReached){
+                stopDraw();
                 clear();
-                console.log('reached')
                 hasReached = true;
                 // remove lower tweet div
-                tweetDiv.remove();
-                emotionParagraph.remove();
-                tweetParagraph.remove();
-                // add button to refresh div
-                let reloadButton = document.createElement('button');
-                reloadButton.textContent = 'Try with another user';
-                playButton.addEventListener("click",reloadPage);
-                document.body.appendChild(reloadButton);
+                // emotionParagraph = document.getElementById('emotionParagraph');
+                // tweetParagraph = document.getElementById('tweetParagraph');
+                // tweetDiv = document.getElementById('tweetDiv');
+                // emotionParagraph.textContent = 'asdfasdf';
+                // emotionParagraph.remove();
+
             }
         }
     }

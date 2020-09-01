@@ -14,7 +14,7 @@ music_rnn = new mm.MusicRNN('https://storage.googleapis.com/magentadata/js/check
 // callback to dispose of synth once it has stopped playing
 synth.onsilence = function () {
     synth.dispose()
-    stop()
+    // stop()
 }
 
 let major = [60, 62, 64, 65, 67, 69, 71, 72, 74, 76, 77, 79, 81, 83, 84];
@@ -99,7 +99,7 @@ function getOverallEmotion() {
 }
 
 function reloadPage(){
-    Location.reload();  
+    location.reload();  
 }
 
 
@@ -271,16 +271,18 @@ async function continueSequence(qns) {
 async function play() {
     // getMelodiesByEmotion();
     // removing the status dom element after a user presses play. 
-    Tone.Transport.stop();
-    if (synth._wasDisposed || synth._synced) {
-        synth.dispose();
-        synth = new Tone.Synth().toDestination()
-        synth.onsilence = function () {
-            synth.unsync();
-            synth.dispose();
-            stop();
-        }
-    }
+
+
+    // Tone.Transport.stop();
+    // if (synth._wasDisposed || synth._synced) {
+    //     synth.dispose();
+    //     synth = new Tone.Synth().toDestination()
+    //     synth.onsilence = function () {
+    //         synth.unsync();
+    //         synth.dispose();
+    //         stop();
+    //     }
+    // }
 
     await music_rnn.initialize();
     let sample = await getFullMelody();
