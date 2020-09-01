@@ -4,7 +4,7 @@
 
 ## About 
 
-* With DJ Tweets, you can put put a Twitter user's tweets to music and watch the melody unfold on your screen as you listen.
+* With DJ Tweets, you can put a Twitter user's tweets to music and watch the melody unfold on your screen as you listen.
 
 ## How It Works
 
@@ -20,13 +20,13 @@
 * Tonal.js
 * p5.js
 * Twitter API
-* Parallel Dots Sentiment Analysis API
+* ParallelDots Sentiment Analysis API
 * Node.js
 * Express.js
 
 ## Installation
 
-* Apply for API keys from Parallel Dots and Twitter
+* Apply for API keys from ParallelDots and Twitter
 * Insert API keys into indicated variables
 * Clone repository and run npm install
 * Run node ./index.js to start your server 😊
