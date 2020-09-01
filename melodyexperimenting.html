@@ -25,18 +25,30 @@
 <body>
     
     <div id='controls'>        
+        <p style="color: white; font-size: 24px;margin-right: 10px;font-weight: 900;">Twitter User:</p>
         <input id="searchPhraseInput" type="text" placeholder="Enter a twitter handle"></input>
-        <button onclick="search()">Search</button>
-        <button onclick="play()">Play</button>
-        <button onclick="stop()">Stop Playback</button>
+        <button id="searchButton" onclick="search()">Search</button>
+        <!-- <button onclick="play()">Play</button> -->
+        <!-- <button onclick="stop()">Stop Playback</button> -->
     </div>
     
-    <div id='loadingScreen'></div>
+    
 
     <script>
         // fix to make input take the width of the placeholder.
         var input = document.getElementById('searchPhraseInput')
         input.setAttribute('size',input.getAttribute('placeholder').length );
+        // Allow for using the enter key
+        document.getElementById('searchPhraseInput').onkeypress = function(e){
+            if (!e) e = window.event;
+            var keyCode = e.keyCode || e.which;
+            if (keyCode == '13'){
+            // Enter pressed
+            search();
+            // This function call is used to test the applicatin without using api calls. 
+            // fakeSearch();
+            }
+        }
         
 
     </script>

@@ -7,6 +7,7 @@
 
 // Initialize synthesizer from Tone.js to use for playback
 let synth = new Tone.Synth().toDestination();
+// for allow
 // Initialize the musicrnn model.
 music_rnn = new mm.MusicRNN('https://storage.googleapis.com/magentadata/js/checkpoints/music_rnn/chord_pitches_improv');
 
@@ -39,6 +40,8 @@ let continueSequenceTemperature;
 
 // gets emotional analysis from tweets.js and finds maximum values from each object to determine dominant emotion
 function setEmotions(data, tweetArray) {
+    // updating the status dom element.
+    document.getElementById('status').textContent = `Creating emotional analysis`
     let unfilteredEmotionsArray = data
     for (let i = 0; i < unfilteredEmotionsArray.length; i++) {
         // find dominant emotion by finding emotion with highest value in object
@@ -49,6 +52,25 @@ function setEmotions(data, tweetArray) {
     }
     getOverallEmotion();
     getMelodiesByEmotion(tweetArray);
+    // updating the status dom element.
+    document.getElementById('status').textContent = `Please press play`;
+    document.getElementById("loadingScreen").remove();
+    playButtonDiv = document.createElement('div');
+    // let controls = document.getElementById('controls');
+    playButton = document.createElement('button');
+    // let stopButton = document.createElement('button');
+    playButtonDiv.setAttribute('id', 'playButtonDiv')
+    playButton.setAttribute('id','playButton');
+    // stopButton.setAttribute('id','stopButton');
+    playButton.textContent = 'Play';
+    playButton.addEventListener("click",play);
+    // stopButton.textContent = 'Stop';
+    // stopButton.addEventListener("click",stop);
+    playButtonDiv.appendChild(playButton)
+    document.body.appendChild(playButtonDiv);
+    // controls.appendChild(stopButton);
+
+
 }
 
 // this function finds the most commonly occurring emotion of all the tweets to set larger variables that affect the individual tweet melodies
@@ -76,11 +98,16 @@ function getOverallEmotion() {
     getTransposition(max.value);
 }
 
+function reloadPage(){
+    Location.reload();  
+}
+
+
 function getNotes(scale, indexArray, minNoteLength, maxNoteLength, emotion, tweetText) {
     let notesPerTweet = 8;
     for (let i = 0; i < notesPerTweet; i++) {
         let newNoteLength = returnNoteLength(minNoteLength, maxNoteLength);
-        let note = { pitch: returnNote(scale, indexArray) + transposition, startTime: startTime, endTime: startTime + newNoteLength, emotion, tweetText }
+        let note = { pitch: returnNote(scale, indexArray) + transposition, startTime: startTime, endTime: startTime + newNoteLength, emotion, tweet: tweetText }
         seedSequence.notes.push(note);
         startTime += newNoteLength;
     }
@@ -156,7 +183,7 @@ function getMelodiesByEmotion(tweetText) {
                 scale = major;
                 indexArray = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14];
                 emotion = "😃";
-                text = tweetText[i];
+                tweet = tweetText[i];
                 break;
             case "indifferent":
                 minNoteLength = 0.5;
@@ -164,7 +191,7 @@ function getMelodiesByEmotion(tweetText) {
                 scale = major;
                 indexArray = [0,1];
                 emotion = "😐";
-                text = tweetText[i];
+                tweet = tweetText[i];
                 break;
             case "angry": 
                 minNoteLength = 0.1;
@@ -172,7 +199,7 @@ function getMelodiesByEmotion(tweetText) {
                 scale = major;
                 indexArray = [0,1,2,3,4,5,6,7];
                 emotion = "😡";
-                text = tweetText[i];
+                tweet = tweetText[i];
                 break;
             case "happy":
                 minNoteLength = 0.3;
@@ -180,7 +207,7 @@ function getMelodiesByEmotion(tweetText) {
                 scale = major;
                 indexArray = [0,2,4,7,9,11];
                 emotion = "🙂";
-                text = tweetText[i];
+                tweet = tweetText[i];
                 break;
             case "fear":
                 minNoteLength = 0.1;
@@ -188,7 +215,7 @@ function getMelodiesByEmotion(tweetText) {
                 scale = minor;
                 indexArray = [7,8,9,10,11,12,13,14];
                 emotion = "😧";
-                text = tweetText[i];
+                tweet = tweetText[i];
                 break;
             case "sad":
                 minNoteLength = 0.5;
@@ -196,7 +223,7 @@ function getMelodiesByEmotion(tweetText) {
                 scale = minor;
                 indexArray = [0,1,2,3,4,5,6,7];
                 emotion = "😢";
-                text = tweetText[i];
+                tweet = tweetText[i];
                 break;
             default:
                 minNoteLength = 0.5;
@@ -204,10 +231,10 @@ function getMelodiesByEmotion(tweetText) {
                 scale = major;
                 indexArray = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14];
                 emotion = "🤪";
-                text = tweetText[i];
+                tweet = tweetText[i];
                 break;
         }
-        getNotes(scale, indexArray, minNoteLength, maxNoteLength, emotion, text)
+        getNotes(scale, indexArray, minNoteLength, maxNoteLength, emotion, tweet)
     }
 }
 
@@ -221,7 +248,7 @@ async function getFullMelody() {
         note.startTime += qns.notes[qns.notes.length - 1].endTime;
         note.endTime += qns.notes[qns.notes.length - 1].endTime;
         note.emotion = overallEmotionEmoji;
-        note.text = "MusicRNN's interpretation of this user's overall tweet mood";
+        note.tweet = "MusicRNN's interpretation of this user's overall tweet mood";
     })
     // combine the two sequences
     let allNotes = seedSequence.notes.concat(sample.notes)
@@ -243,7 +270,7 @@ async function continueSequence(qns) {
 
 async function play() {
     // getMelodiesByEmotion();
-
+    // removing the status dom element after a user presses play. 
     Tone.Transport.stop();
     if (synth._wasDisposed || synth._synced) {
         synth.dispose();
@@ -260,6 +287,7 @@ async function play() {
     // // send the musical data to sketch.js
     // // this line below and Tone.Transport.start() need to be uncommented in order to be able to hit play multiple times
     synth.sync();
+
     await sample.notes.forEach(async (note) => {
         synth.triggerAttackRelease(Tonal.Note.fromMidi(note.pitch), note.endTime - note.startTime, note.startTime)    
     })
@@ -275,6 +303,7 @@ function stop() {
     // // synth.context.transport.cancel()
     // console.log("before dispose")
     // // console.log(synth.context.transport._scheduledEvents)
+    // synth.clear();
     synth.dispose();
     // console.log("after dispose")
     // console.log(synth)
