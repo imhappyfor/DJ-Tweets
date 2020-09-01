@@ -30,3 +30,12 @@
 * Insert API keys into indicated variables
 * Clone repository and run npm install
 * Run node ./index.js to start your server 😊
+
+![Landing page screenshot](./public/assets/landing.png)
+Landing page
+
+![Landing page screenshot](./public/assets/ready.png)
+Player ready!
+
+![Landing page screenshot](./public/assets/music.png)
+Display while piece is playing
