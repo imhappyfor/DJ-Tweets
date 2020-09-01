@@ -34,11 +34,6 @@ musicalData = undefined
 onePass = false
 canDraw = false
 
-
-
-
-
-
 }
 function notesToSketch(data){
     
@@ -210,43 +205,4 @@ function move(){
         x -= 10
         y -= 10
     }
-}
-
-
-var config = {
-    noteHeight: 6,
-    pixelsPerTimeStep: 30,  // like a note width
-    noteSpacing: 1,
-    noteRGB: '8, 41, 64',
-    activeNoteRGB: '240, 84, 119',
-}
-
-let viz = null
-const mvae = new music_vae.MusicVAE('https://storage.googleapis.com/magentadata/js/checkpoints/music_vae/mel_2bar_small');
-function userClicked(){
-    mvae.initialize().then(() => {
-        mvae.sample(1).then((samples) => 
-        {
-
-            console.log(samples[0])
-            let seq = mm.sequences.unquantizeSequence(samples[0]);
-            viz = new mm.PianoRollCanvasVisualizer(seq, document.getElementById('canvas'), config);
-            player = new core.Player(false, {
-                run: (note) => {
-                    let newNote = {
-                        endTime: note.endTime,
-                        pitch: note.pitch,
-                        startTime: note.startTime
-                    }
-                    viz.redraw(newNote)
-                },
-                stop: () => {console.log('done')}
-            });
-            player.start(samples[0])
-            draw(null,null,samples[0])
-            // player.start(TWINKLE_TWINKLE) 
-            
-        }
-        );
-    });
 }
