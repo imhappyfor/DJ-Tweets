@@ -98,3 +98,89 @@ function search(){
 function isASCII(str) {
     return /^[\x00-\x7F]*$/.test(str);
 }
+
+function fakeSearch() {
+    let data = [
+            {
+                happy: 0.99975,
+                angry: 0.000021,
+                fear: 0.000049,
+                excited: 0.000012,
+                indifferent: 0.000147,
+                sad: 0.000021
+            },
+            {
+                indifferent: 0.99975,
+                angry: 0.000021,
+                fear: 0.000049,
+                excited: 0.000012,
+                happy: 0.000147,
+                sad: 0.000021
+            },
+            {
+                angry: 0.000002,
+                excited: 0.999982,
+                fear: 0.000003,
+                happy: 0.000008,
+                indifferent: 0.000003,
+                sad: 0.000002
+            },
+            {
+                happy: 0.99975,
+                excited: 0.000021,
+                fear: 0.000049,
+                angry: 0.000012,
+                indifferent: 0.000147,
+                sad: 0.000021
+            },
+            {
+                angry: 0.000005,
+                indifferent: 0.000005,
+                fear: 0.000001,
+                happy: 0.000016,
+                excited: 0.99997,
+                sad: 0.000003
+            },
+            {
+                angry: 0.000005,
+                excited: 0.000005,
+                fear: 0.000001,
+                happy: 0.000016,
+                indifferent: 0.99997,
+                sad: 0.000003
+            },
+            {
+                happy: 0.99975,
+                excited: 0.000021,
+                fear: 0.000049,
+                angry: 0.000012,
+                indifferent: 0.000147,
+                sad: 0.000021
+            },
+            {
+                fear: 0.99975,
+                excited: 0.000021,
+                angry: 0.000049,
+                happy: 0.000012,
+                indifferent: 0.000147,
+                sad: 0.000021
+            },
+            {
+                sad: 0.99975,
+                excited: 0.000021,
+                fear: 0.000049,
+                happy: 0.000012,
+                indifferent: 0.000147,
+                angry: 0.000021
+            },
+            {
+                fear: 0.99975,
+                happy: 0.000021,
+                excited: 0.000049,
+                indifferent: 0.000012,
+                angry: 0.000147,
+                sad: 0.000021
+            },
+        ]
+    setEmotions(data);
+}
