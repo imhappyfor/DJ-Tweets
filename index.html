@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <!-- musical cdn sources -->
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.1.9/lib/p5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.39/Tone.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tonaljs/tonal/browser/tonal.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@magenta/music@^1.0.0/es6/core.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@magenta/music@1.0.0"></script>
+    
+    <!-- local resources  -->
+        <!-- js files -->
+    <script src="./public/assets/tweets.js"></script>
+    <script src="./public/assets/player.js"></script>
+    <script src="./public/assets/sketch.js"></script>
+        <!-- css files -->
+    <link rel="stylesheet"  type="text/css" href="./public/assets/style.css">
+    
+</head>
+
+<body>
+    
+    <div id='controls'>        
+        <p style="color: white; font-size: 24px;margin-right: 10px;font-weight: 900;">Twitter User:</p>
+        <input id="searchPhraseInput" type="text" placeholder="Enter a twitter handle"></input>
+        <button id="searchButton" onclick="search()">Search</button>
+        <!-- <button onclick="play()">Play</button> -->
+        <!-- <button onclick="stop()">Stop Playback</button> -->
+    </div>
+    
+    
+
+    <script>
+        // fix to make input take the width of the placeholder.
+        var input = document.getElementById('searchPhraseInput')
+        input.setAttribute('size',input.getAttribute('placeholder').length );
+        // Allow for using the enter key
+        document.getElementById('searchPhraseInput').onkeypress = function(e){
+            if (!e) e = window.event;
+            var keyCode = e.keyCode || e.which;
+            if (keyCode == '13'){
+            // Enter pressed
+            search();
+            // This function call is used to test the applicatin without using api calls. 
+            // fakeSearch();
+            }
+        }
+        
+
+    </script>
+
+</body>
+
+
+</html>

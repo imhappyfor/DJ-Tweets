@@ -1,70 +1,201 @@
-function setup(){
-createCanvas(windowWidth, 500, WEBGL);
-maxX = Math.floor(windowWidth/2);    
-maxY = Math.floor(windowHeight/2); 
-hasMaxed = false;
-rectangleWidth = 800;
-rectangleHeight = 400;
-x = -rectangleWidth/2;
-y = -rectangleHeight/2;
-lhasChanged = false;
-rhasChanged = false;
-// container = function(){return rect(x,y,rectangleWidth,rectangleHeight) }
+function setup(render){
+    if(render){
+        createCanvas(windowWidth, 500);
+        tweetDiv = document.createElement('div');
+        emotionParagraph = document.createElement('p');
+        tweetParagraph = document.createElement('p');
+        hasReached = false
+        tweetDiv.setAttribute('id','tweetDiv');
+        tweetParagraph.setAttribute('id','tweetParagraph');
+        emotionParagraph.setAttribute('id','emotionParagraph');
+        tweetDiv.style.display = "flex";
+        tweetDiv.style.flexDirection= "column";
+        tweetDiv.style.justifyContent ="center";
+        tweetDiv.style.alignItems = "center";
+        tweetParagraph.style.fontSize = "24px"
+        emotionParagraph.style.fontSize = "24px"
+        tweetParagraph.style.color = 'whitesmoke'
+        emotionParagraph.style.color = 'whitesmoke'
+        tweetDiv.appendChild(emotionParagraph);
+        tweetDiv.appendChild(tweetParagraph);
+        document.body.appendChild(tweetDiv);
+    }
+// maxX = Math.floor(windowWidth/2);    
+// maxY = Math.floor(500/2); 
+// hasMaxed = false;
+// rectangleWidth = 800;
+// rectangleHeight = 400;
+// x = -rectangleWidth/2
+// y = -rectangleHeight/2
+// i = 0.0001;
+// noteWidth = 50;
+searchQuery = 'andrewyang'
+musicalData = undefined
+onePass = false
+canDraw = false
+
+
+
+
+
+
 }
-// let matrix = 3
-function draw(left,right,leftSequence, rightSequence){
-    // console.log(left,right)
+function notesToSketch(data){
     
-    background(125,20,36);
-    circle()
-    // for (let x = 0; x < matrix*matrix; x++){
-    //     fill(x*20,50,x*12);
-    //     rect((20 + x*20),(20 - x*20),20,20);
+    setup(true);
+    clear();
+    canDraw = true;
+    loadingScreen(false)
+    musicalData = {}
+    musicalData["data"] = data;
+    musicalData["totalTime"] =  data[data.length - 1]["endTime"] - data[0]["startTime"];
+    musicalData["highestPitch"] = data[Object.keys(data).reduce(function(a, b){ 
+        return data[a]["pitch"] > data[b]["pitch"] ? a : b
+    })]["pitch"];
+    musicalData["lowestPitch"] = data[Object.keys(data).reduce(function(a, b){ 
+        return data[a]["pitch"] < data[b]["pitch"] ? a : b
+    })]["pitch"];
+
+}
+
+function draw(){
+    if (canDraw)
+    {   
+        
+        background(50,20,96);
+        drawNotesAndEmotion(musicalData);
+    }
+    
+    // for (let x = 0; x < notes*notes; x++){
+    //     fill(x*20*i,50,10*i);
+    //     rect((-maxX + x*(noteWidth/windowWidth)*noteWidth),0,(noteWidth/windowWidth)*noteWidth,10);
+    //     i += 0.0001;
     // }
     
     // if (x){
         
     // }
     
-    // container();
-    if (right) {
-        rhasChanged = true;
-        fill(120,Math.floor(Math.random()*100+1),Math.floor(Math.random()*120)+1);
-        rect(-(width/2),-(height/2),width/2,height);
-    }
-    else {
-        // fill('green')
-        // translate(0, 0, 1);
-        // push();
-        // rotateZ(frameCount * 0.01);
-        // rotateX(frameCount * 0.01);
-        // rotateY(frameCount * 0.01);
-        // torus(70, 10);
-        // pop();
-        fill('blue');
-        rect(-(width/2),-(height/2),width/2,height);
-    }
-
-    if (left || lhasChanged){
-        lhasChanged = true;
-        fill('purple');
-        rect(0,-(height/2),width/2,height);
-    }
-    else {
-        fill('red');
-        rect(0,-(height/2),width/2,height);
-    }
-
-
     
+
+    // SPLIT VIEW EXAMPLE
+        // fill('red');
+        // rect(-(width/2),-(height/2),width/2,height);
+        // fill('blue');
+        // rect(0,-(height/2),width/2,height);
     
 }
+
+function stopDraw(){
+    // musicalData = undefined
+    let emotionParagraph = document.getElementById("emotionParagraph")
+    let tweetParagraph = document.getElementById("tweetParagraph")
+    emotionParagraph.remove()
+    tweetParagraph.remove()
+    // tweetParagraph.remove();
+    // tweetDiv.remove();
+    // add button to refresh div
+
+    let reloadDiv = document.createElement('div');
+    reloadDiv.style.display = "flex";
+    reloadDiv.style.justifyContent ="center";
+    reloadDiv.style.alignItems = "center";
+
+    let reloadButton = document.createElement('button');
+    reloadButton.textContent = 'Try with another user';
+    reloadButton.addEventListener("click",reloadPage);
+
+    reloadDiv.appendChild(reloadButton);
+    document.body.appendChild(reloadDiv);
+}
+
+function updateTweetData(tweetData){
+    document.getElementById("emotionParagraph").textContent = tweetData[0]
+    document.getElementById("tweetParagraph").textContent = tweetData[1]
+}
+
+function drawNotesAndEmotion(a){
+    background(50,20,96);
+    if(a){
+        if(!onePass){
+            a["data"]
+            onePass = true;
+        }
+        for (let note = 0; note < a["data"].length; note++){
+
+            let currentTime = synth.context.transport.now()
+            let noteDuration = a["data"][note]["endTime"] - a["data"][note]["startTime"]
+            let multiplier = windowWidth/a["totalTime"]
+            fill(20,50,10);
+            // if (note == a["data"].length-1){
+            //     // console.log(note)
+            //     // console.log(a["data"][note])
+            //     fill('blue');
+            // }
+
+
+
+
+
+            if ( a["data"][note]["startTime"] <= currentTime){
+                fill('white');
+
+                updateTweetData(
+                [`Tweet Emotion: ${a["data"][note]['emotion']}`,
+                `Tweet: ${a["data"][note]['tweet']}`]
+                )
+
+
+                // textSize(32);
+                // textAlign(CENTER);
+                // text(`Tweet Emotion: ${a["data"][note]['emotion']}`, width/2, height*0.70);
+                // textSize(12);
+                // textAlign(CENTER);
+                // text(`Tweet: ${a["data"][note]['tweet']}`, width/2, height*0.80);
+                // fill('white')
+            }
+            rect(
+                // x
+                a["data"][note]["startTime"] * multiplier
+            // note * noteDuration/a["totalTime"] *  windowWidth
+            // y
+            // ,500/2
+
+            ,a["data"][note]["pitch"]
+            // ,((a["data"][note]["pitch"] / (a["highestPitch"] - a["lowestPitch"])) * a["data"][note]["pitch"] ) 
+            // width
+            , noteDuration * multiplier
+            // ,noteDuration/a["totalTime"] *  windowWidth
+            // height
+            ,20
+            );
+
+            if ( musicalData["totalTime"] <= currentTime && !hasReached){
+                stopDraw();
+                clear();
+                hasReached = true;
+                // remove lower tweet div
+                // emotionParagraph = document.getElementById('emotionParagraph');
+                // tweetParagraph = document.getElementById('tweetParagraph');
+                // tweetDiv = document.getElementById('tweetDiv');
+                // emotionParagraph.textContent = 'asdfasdf';
+                // emotionParagraph.remove();
+
+            }
+        }
+    }
+    return
+}
+
+// 60.23529411764706 2560 42.5
+
 function mousePressed(){
     
 }
 
 function windowResized(){
     resizeCanvas(windowWidth, 500);
+    
 }
 
 function move(){
