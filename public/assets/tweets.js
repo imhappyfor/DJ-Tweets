@@ -99,6 +99,8 @@ function search(){
 function loadingScreen(x){
     if(x === true){
         document.getElementById("searchButton").remove();
+        document.getElementById("Welcome").remove();
+        
         let userInput = document.getElementById('searchPhraseInput').value
         let statusDiv = document.createElement('div');
         let loadingDiv = document.createElement('div');
