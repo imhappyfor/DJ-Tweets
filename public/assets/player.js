@@ -242,7 +242,7 @@ async function continueSequence(qns) {
 }
 
 async function play() {
-    getMelodiesByEmotion();
+    // getMelodiesByEmotion();
 
     Tone.Transport.stop();
     if (synth._wasDisposed || synth._synced) {
