@@ -3,11 +3,11 @@
 // pass to music genetor file
 let arrayOfEmotions = [];
 const maxResults = 10;
-let twittetUserTweets= [];
+let twitterUserTweets= [];
 let twitterUserResultLength = 0;
 let regexPattern = /[^a-z-A-Z ]/gm;
 function getTweetsByUser(twitterUser) {
-    twittetUserTweets= [];
+    twitterUserTweets= [];
     const token = "AAAAAAAAAAAAAAAAAAAAANLsHAEAAAAAWEaIgVm24L29R1SZEOFHW3JSyOU%3DdMPt50AorHw4ZKtHSCrRB0s1Me21Ly9K1PrIEvSXQ1gM0J9Eb9";
     // the emotional analysis API free tier is limited to 60 hits per minute, if ever upgraded we would ideally pull more (Twitter max is 100, default is 10)
     // this request fetches tweets from the user passed up to the max limit, filtering out retweets
@@ -25,12 +25,15 @@ function getTweetsByUser(twitterUser) {
         for (let i = results.data.length - 1; i >= 0; i--) {
             console.log(i, results.data.length - 1, results.data[0], results.data[i])
             twitterUserResultLength++
-            twittetUserTweets.push(results.data[i].text);
+            twitterUserTweets.push(results.data[i].text);
         }
         // call analyzeText to get sentiment Analysis.
-        analyzeText(twittetUserTweets)
-    }).catch((err) => console.log(err))
-    ;
+        analyzeText(twitterUserTweets)
+    }).catch((err) => {
+        document.getElementById("loadingScreen").remove()
+        document.getElementById("status").textContent = `Error: ${err}.`
+        reloadButton()
+    });
 }
    // emotion analysis 1000 requests / day
    // This api returns an "emotion" object that contains the following keys: value pairs - happy, sad, angry, fear, excited :? Floating Point Number totaling to 1.0
