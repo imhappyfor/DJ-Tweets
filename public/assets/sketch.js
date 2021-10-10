@@ -91,17 +91,7 @@ function stopDraw(){
     // tweetDiv.remove();
     // add button to refresh div
 
-    let reloadDiv = document.createElement('div');
-    reloadDiv.style.display = "flex";
-    reloadDiv.style.justifyContent ="center";
-    reloadDiv.style.alignItems = "center";
-
-    let reloadButton = document.createElement('button');
-    reloadButton.textContent = 'Try with another user';
-    reloadButton.addEventListener("click",reloadPage);
-
-    reloadDiv.appendChild(reloadButton);
-    document.body.appendChild(reloadDiv);
+    reloadButton()
 }
 
 function updateTweetData(tweetData){
