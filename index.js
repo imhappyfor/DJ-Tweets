@@ -1,10 +1,11 @@
 const express = require('express');
+const cors = require('cors');
+const path = require('path');
 const app = express();
-var cors = require('cors');
-var path = require('path');
+const port = 3000;
+
 app.use(cors());
-const port = 3000
-app.use('/public', express.static('public/'))
+app.use('/public', express.static('public/'));
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname + '/index.html'));
@@ -15,5 +16,5 @@ app.get('/', (req, res) => {
 // })
 
 app.listen(port, () => {
-    console.log(`Example app listening at http://localhost:${port}`)
+    console.log(`DJ-Tweets listening at http://localhost:${port} 😎🎸🤘`);
 })
